@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulaire de Connexion</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <form action="connexion.php" method="post">
+        <label for="numero_de_telephone">Numéro de téléphone :</label>
+        <input type="text" id="numero_de_telephone" name="numero_de_telephone" required pattern="[0-9]{10}">
+        <label for="password">Mot de passe :</label>
+        <input type="password" id="password" name="password" required>
+        <input type="submit" value="Se connecter">
+    </form>
+</body>
+</html>

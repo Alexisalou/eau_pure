@@ -24,7 +24,7 @@ cursor = conn.cursor()
 
 # Fonction qui génère des valeurs factices
 def generate_fake_data():
-    pluviometer_value = round(random.uniform(0, 1), 2)  # Valeur aléatoire pour le pluviomètre 
+    pluviometer_value = round(random.uniform(0, 20), 2)  # Valeur aléatoire pour le pluviomètre 
     limnimeter_value = round(random.uniform(0, 10), 2)    # Valeur aléatoire pour le limnimètre 
     return pluviometer_value, limnimeter_value
 

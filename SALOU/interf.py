@@ -2,13 +2,13 @@ import mysql.connector
 import random
 from datetime import datetime
 
-DATABASE_HOST = 'localhost'  
+DATABASE_HOST = '10.0.14.4'  
 DATABASE_NAME = 'eau_pure'  
 DATABASE_USER = 'root'  
 DATABASE_PASSWORD = 'ieufdl'
 DATABASE_PORT = '9999'  # Port mysql ouvert sur le serveur
 
-
+def generate_fake_data():
     pluviometer_value = round(random.uniform(0, 20), 2)  # Valeur aléatoire pour le pluviomètre 
     limnimeter_value = round(random.uniform(0, 10), 2)    # Valeur aléatoire pour le limnimètre 
     return pluviometer_value, limnimeter_value

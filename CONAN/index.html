@@ -4,14 +4,239 @@
     <meta charset="UTF-8">
     <title>Formulaire de Connexion</title>
     <link rel="stylesheet" href="connexion.css">
+    <style>
+        /* Styles pour les pop-ups */
+        .popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            border-radius: 10px;
+            width: 350px;
+            text-align: center;
+        }
+        .popup .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .button-container {
+            margin-top: 20px;
+        }
+        .button-container button {
+            margin: 5px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #ff7e5f;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .button-container button:hover {
+            background: #feb47b;
+        }
+        .connect-btn, .gestion-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #ff7e5f;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 10px;
+        }
+        .connect-btn:hover, .gestion-btn:hover {
+            background: #feb47b;
+        }
+    </style>
 </head>
 <body>
+
+    <!-- Formulaire de Connexion -->
     <form action="connexion.php" method="post">
+        <input type="hidden" name="action" value="login">
         <label for="numero_de_telephone">Numéro de téléphone :</label>
         <input type="text" id="numero_de_telephone" name="numero_de_telephone" required pattern="[0-9]{10}">
+
         <label for="password">Mot de passe :</label>
         <input type="password" id="password" name="password" required>
-        <input type="submit" value="Se connecter">
+
+        <input type="submit" value="Se connecter" class="connect-btn">
+
+        <!-- Bouton pour gérer les utilisateurs (ouvre une popup) -->
+        <button type="button" class="gestion-btn" onclick="ouvrirPopup('popupAdmin')">Gestion des utilisateurs</button>
     </form>
+
+    <!-- Overlay pour les pop-ups -->
+    <div id="overlay" class="overlay" onclick="fermerPopupTous()"></div>
+
+    <!-- Popup de validation pour l'accès admin -->
+    <div id="popupAdmin" class="popup">
+        <span class="close" onclick="fermerPopup('popupAdmin')">&times;</span>
+        <form id="adminForm" action="connexion.php" method="post" onsubmit="return verifierAdmin();">
+            <input type="hidden" name="action" value="admin">
+            <label for="mdp_admin">Mot de passe admin :</label>
+            <input type="password" id="mdp_admin" name="mdp_admin" required>
+            <div class="button-container">
+                <input type="submit" value="Valider">
+                <button type="button" onclick="fermerPopup('popupAdmin')">Annuler</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Popup pour gérer Ajout / Modification / Suppression -->
+    <div id="popupGestion" class="popup">
+        <span class="close" onclick="fermerPopup('popupGestion')">&times;</span>
+        <div class="button-container">
+            <button onclick="ouvrirFormPopup('ajout')">Ajouter un utilisateur</button>
+            <button onclick="ouvrirFormPopup('modifier')">Modifier un utilisateur</button>
+            <button onclick="ouvrirFormPopup('supprimer')">Supprimer un utilisateur</button>
+            <button type="button" onclick="fermerPopup('popupGestion')">Annuler</button>
+        </div>
+    </div>
+
+    <!-- Formulaire Ajout Utilisateur -->
+    <div id="popupAjout" class="popup">
+        <span class="close" onclick="fermerPopup('popupAjout')">&times;</span>
+        <form action="connexion.php" method="post">
+            <input type="hidden" name="action" value="ajout">
+
+            <label for="numero">Numéro de téléphone :</label>
+            <input type="text" id="numero" name="numero" required pattern="[0-9]{10}">
+
+            <label for="conf_numero">Confirmer le numéro :</label>
+            <input type="text" id="conf_numero" name="conf_numero" required pattern="[0-9]{10}">
+
+            <label for="password">Mot de passe :</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="conf_password">Confirmer le mot de passe :</label>
+            <input type="password" id="conf_password" name="conf_password" required>
+
+            <div class="button-container">
+                <input type="submit" value="Ajouter">
+                <button type="button" onclick="fermerPopup('popupAjout')">Annuler</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Formulaire Modification Utilisateur -->
+    <div id="popupModifier" class="popup">
+        <span class="close" onclick="fermerPopup('popupModifier')">&times;</span>
+        <form action="connexion.php" method="post">
+            <input type="hidden" name="action" value="modifier">
+
+            <label for="num_modif">Numéro de téléphone :</label>
+            <input type="text" id="num_modif" name="numero" required pattern="[0-9]{10}">
+
+            <label for="ancien_password">Mot de passe actuel :</label>
+            <input type="password" id="ancien_password" name="ancien_password" required>
+
+            <label for="new_password">Nouveau mot de passe :</label>
+            <input type="password" id="new_password" name="new_password" required>
+
+            <label for="conf_new_password">Confirmer le nouveau mot de passe :</label>
+            <input type="password" id="conf_new_password" name="conf_new_password" required>
+
+            <div class="button-container">
+                <input type="submit" value="Modifier">
+                <button type="button" onclick="fermerPopup('popupModifier')">Annuler</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Formulaire Suppression Utilisateur -->
+    <div id="popupSupprimer" class="popup">
+        <span class="close" onclick="fermerPopup('popupSupprimer')">&times;</span>
+        <form action="connexion.php" method="post">
+            <input type="hidden" name="action" value="supprimer">
+
+            <label for="num_supp">Numéro de téléphone :</label>
+            <input type="text" id="num_supp" name="numero" required pattern="[0-9]{10}">
+
+            <label for="conf_num_supp">Confirmer le numéro :</label>
+            <input type="text" id="conf_num_supp" name="conf_numero" required pattern="[0-9]{10}">
+
+            <label for="password_supp">Mot de passe actuel :</label>
+            <input type="password" id="password_supp" name="password" required>
+
+            <label for="conf_password_supp">Confirmer le mot de passe :</label>
+            <input type="password" id="conf_password_supp" name="conf_password" required>
+
+            <div class="button-container">
+                <input type="submit" value="Supprimer">
+                <button type="button" onclick="fermerPopup('popupSupprimer')">Annuler</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function ouvrirPopup(popupId) {
+            document.body.classList.add('flou'); // Ajoute le flou au corps de la page
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById(popupId).style.display = "block";
+        }
+
+        function fermerPopup(popupId) {
+            document.body.classList.remove('flou'); // Retire le flou du corps de la page
+            document.getElementById(popupId).style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+        }
+
+        function fermerPopupTous() {
+            const popups = document.querySelectorAll('.popup');
+            popups.forEach(function(popup) {
+                popup.style.display = 'none';
+            });
+            document.getElementById("overlay").style.display = "none";
+            document.body.classList.remove('flou');
+        }
+
+        function ouvrirFormPopup(type) {
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById("popupGestion").style.display = "none";
+            document.getElementById("popup" + type.charAt(0).toUpperCase() + type.slice(1)).style.display = "block";
+        }
+
+        function verifierAdmin() {
+            var mdpAdmin = document.getElementById("mdp_admin").value;
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "connexion.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    if (xhr.responseText.includes("Mot de passe admin incorrect")) {
+                        alert("Mot de passe admin incorrect");
+                    } else {
+                        fermerPopup('popupAdmin');
+                        ouvrirPopup('popupGestion');
+                    }
+                }
+            };
+            xhr.send("action=admin&mdp_admin=" + encodeURIComponent(mdpAdmin));
+            return false;
+        }
+    </script>
+
 </body>
 </html>

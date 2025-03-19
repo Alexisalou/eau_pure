@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $DATABASE_HOST = '10.0.14.4';
 $DATABASE_NAME = 'eau_pure';
 $DATABASE_USER = 'root';
@@ -31,26 +33,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'dco' => ['value' => $_POST['dco'], 'unite' => 'mg/L']
     ];
 
-    $prelevement = 1;
-    $stmt = $conn->prepare("SELECT id FROM Echantillon WHERE id = ?");
-    $stmt->bind_param('i', $prelevement);
-    $stmt->execute();
-    $stmt->store_result();
+    $preleveur = 2; // Le champ preleveur est toujours à 2
+    $date = date('Y-m-d H:i:s'); // Obtenez la date et l'heure actuelles
 
-    if ($stmt->num_rows == 0) {
-        $stmt->close();
-        $date = date('Y-m-d H:i:s'); // Obtenez la date et l'heure actuelles
-        $stmt = $conn->prepare("INSERT INTO Echantillon (id, date) VALUES (?, ?)");
-        $stmt->bind_param('is', $prelevement, $date);
-        if (!$stmt->execute()) {
+    // Vérifier si l'ID du technicien est dans la session
+    if (!isset($_SESSION['technicien_id'])) {
+        die("ID du technicien non trouvé dans la session.");
+    }
+    $technicien_id = $_SESSION['technicien_id']; // Récupérer l'ID du technicien depuis la session
+
+    // Insertion dans la table Echantillon
+    $stmt = $conn->prepare("INSERT INTO Echantillon (date, preleveur, technicien) VALUES (?, ?, ?)");
+    if ($stmt) {
+        $stmt->bind_param('sii', $date, $preleveur, $technicien_id);
+        if ($stmt->execute()) {
+            $prelevement = $stmt->insert_id; // Récupérer l'ID auto-incrémenté de la nouvelle ligne insérée
+        } else {
             die("Erreur d'insertion dans la table Echantillon: " . $stmt->error);
         }
+        $stmt->close();
+    } else {
+        die("Erreur de préparation de la requête SQL pour Echantillon.");
     }
-    $stmt->close();
 
+    // Insertion dans la table Analyse
     $stmt = $conn->prepare("INSERT INTO Analyse (prelevement, valeur, unite, type, date) VALUES (?, ?, ?, ?, ?)");
     if ($stmt) {
-        $date = date('Y-m-d H:i:s');
         foreach ($data as $type => $info) {
             $stmt->bind_param('idsss', $prelevement, $info['value'], $info['unite'], $type, $date);
             if (!$stmt->execute()) {
@@ -60,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->close();
         echo "Données insérées avec succès.";
     } else {
-        echo "Erreur de préparation de la requête SQL.";
+        echo "Erreur de préparation de la requête SQL pour Analyse.";
     }
 }
 

@@ -8,28 +8,33 @@ body {
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    transition: filter 0.3s ease; /* Transition pour le flou */
 }
 
-/* Appliquer le flou sur le fond quand une popup est ouverte */
-body.flou {
-    filter: blur(5px); /* Applique un flou sur le fond */
-}
-
-/* Formulaire de connexion */
 form {
     background: rgba(255, 255, 255, 0.9);
     padding: 40px 60px;
     border-radius: 10px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    width: 300px;
-    text-align: center;
-    position: relative;
-    z-index: 1; /* Assure que le formulaire est sous les pop-ups */
 }
 
-/* Bouton de connexion et gestion des utilisateurs */
-.connect-btn, .gestion-btn {
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+input[type="submit"] {
     width: 100%;
     padding: 10px;
     border: none;
@@ -39,51 +44,8 @@ form {
     font-size: 16px;
     cursor: pointer;
     transition: background 0.3s ease;
-    margin-top: 10px;
 }
 
-.connect-btn:hover, .gestion-btn:hover {
+input[type="submit"]:hover {
     background: #feb47b;
-}
-
-/* Pop-ups */
-.popup {
-    display: none; /* Hide pop-ups by default */
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    padding: 30px;
-    background-color: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    border-radius: 10px;
-    width: 350px;
-    text-align: center;
-}
-
-/* Bouton Annuler */
-button[type="button"] {
-    background: #ff7e5f;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button[type="button"]:hover {
-    background: #feb47b;
-}
-
-/* Overlay (fond semi-transparent) */
-.overlay {
-    display: none; /* Hide overlay by default */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
 }

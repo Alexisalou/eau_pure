@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $DATABASE_HOST = '10.0.14.4';
 $DATABASE_NAME = 'eau_pure';
 $DATABASE_USER = 'root';
@@ -42,17 +44,18 @@ function login($conn) {
     $numero_de_telephone = $_POST['numero_de_telephone'];
     $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT mot_de_passe FROM Technicien WHERE numero_de_telephone = ?");
+    $stmt = $conn->prepare("SELECT id, mot_de_passe FROM Technicien WHERE numero_de_telephone = ?");
     if ($stmt) {
         $stmt->bind_param('s', $numero_de_telephone);
         $stmt->execute();
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($hashed_password);
+            $stmt->bind_result($technicien_id, $hashed_password);
             $stmt->fetch();
 
             if (password_verify($password, $hashed_password)) {
+                $_SESSION['technicien_id'] = $technicien_id; // Stocker l'ID du technicien dans la session
                 header("Location: données_physico_chimiques.html");
                 exit();
             } else {

@@ -56,7 +56,7 @@ function login($conn) {
 
             if (password_verify($password, $hashed_password)) {
                 $_SESSION['technicien_id'] = $technicien_id; // Stocker l'ID du technicien dans la session
-                header("Location: données_physico_chimiques.html");
+                header("Location: données_physico_chimiques.php");
                 exit();
             } else {
                 echo "Mot de passe incorrect.";
@@ -99,6 +99,17 @@ function verifierAdmin($conn) {
     }
 }
 
+function validerMotDePasse($password) {
+    $longueurMin = 8;
+    $majuscule = '/[A-Z]/';
+    $caractereSpecial = '/[\W_]/';
+
+    if (strlen($password) < $longueurMin || !preg_match($majuscule, $password) || !preg_match($caractereSpecial, $password)) {
+        return false;
+    }
+    return true;
+}
+
 function ajoutUtilisateur($conn) {
     $numero = $_POST['numero'];
     $conf_numero = $_POST['conf_numero'];
@@ -107,6 +118,10 @@ function ajoutUtilisateur($conn) {
 
     if ($numero !== $conf_numero || $password !== $conf_password) {
         die("Les numéros de téléphone ou mots de passe ne correspondent pas.");
+    }
+
+    if (!validerMotDePasse($password)) {
+        die("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.");
     }
 
     $hash = password_hash($password, PASSWORD_BCRYPT);
@@ -132,11 +147,15 @@ function modifierUtilisateur($conn) {
         die("Les nouveaux mots de passe ne correspondent pas.");
     }
 
+    if (!validerMotDePasse($new_password)) {
+        die("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.");
+    }
+
     $stmt = $conn->prepare("SELECT mot_de_passe FROM Technicien WHERE numero_de_telephone = ?");
     $stmt->bind_param("s", $numero);
     $stmt->execute();
     $stmt->store_result();
-    
+
     if ($stmt->num_rows === 0) {
         die("Numéro de téléphone non trouvé.");
     }
@@ -171,6 +190,10 @@ function supprimerUtilisateur($conn) {
 
     if ($numero !== $conf_numero || $password !== $conf_password) {
         die("Les informations saisies ne correspondent pas.");
+    }
+
+    if (!validerMotDePasse($password)) {
+        die("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.");
     }
 
     $stmt = $conn->prepare("SELECT mot_de_passe FROM Technicien WHERE numero_de_telephone = ?");

@@ -1,6 +1,6 @@
 import time
 from datetime import datetime
-from interf import generate_fake_data, Envois_mesures, lire_seuils, lire_mesures
+from interf import generate_fake_data, Envois_mesures, lire_seuils, lire_mesures, PLUVIOMETER_SENSOR_ID, LIMNIMETER_SENSOR_ID
 
 # Information de connexion à la BDD
 DATABASE_HOST = '10.0.14.4'  
@@ -15,10 +15,10 @@ def insert_fake_data():
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  
     
     # Insertion des données du pluviomètre
-    Envois_mesures(1, pluviometer_value, 'L/m²', current_time)
+    Envois_mesures(PLUVIOMETER_SENSOR_ID, pluviometer_value, 'L/m²', current_time)
     
     # Insertion des données du limnimètre
-    Envois_mesures(2, limnimeter_value, 'm', current_time)
+    Envois_mesures(LIMNIMETER_SENSOR_ID, limnimeter_value, 'm', current_time)
     
     print(f"Pluviomètre: {pluviometer_value} L/m², Limnimètre: {limnimeter_value} m à {current_time}")
 

@@ -8,6 +8,9 @@ DATABASE_USER = 'root'
 DATABASE_PASSWORD = 'ieufdl'
 DATABASE_PORT = '9999'  # Port mysql ouvert sur le serveur
 
+PLUVIOMETER_SENSOR_ID = 1
+LIMNIMETER_SENSOR_ID = 2
+
 def generate_fake_data():
     pluviometer_value = round(random.uniform(0, 20), 2)  # Valeur aléatoire pour le pluviomètre 
     limnimeter_value = round(random.uniform(0, 10), 2)    # Valeur aléatoire pour le limnimètre 
@@ -81,11 +84,11 @@ def lire_mesures(db_config):
     cursor = db.cursor()
     
     # Récupérer la dernière mesure du pluviomètre
-    cursor.execute("SELECT valeur FROM Mesure WHERE capteur = 1 ORDER BY date DESC LIMIT 1")
+    cursor.execute("SELECT valeur FROM Mesure WHERE capteur = %s ORDER BY date DESC LIMIT 1", (PLUVIOMETER_SENSOR_ID,))
     mesure_pluviometre = cursor.fetchone()
     
     # Récupérer la dernière mesure du limnimètre
-    cursor.execute("SELECT valeur FROM Mesure WHERE capteur = 2 ORDER BY date DESC LIMIT 1")
+    cursor.execute("SELECT valeur FROM Mesure WHERE capteur = %s ORDER BY date DESC LIMIT 1", (LIMNIMETER_SENSOR_ID,))
     mesure_limnimetre = cursor.fetchone()
     
     db.close()

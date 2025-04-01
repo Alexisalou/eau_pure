@@ -44,6 +44,8 @@ if ($result->num_rows > 0) {
             'unite' => $row['unite']
         ];
     }
+} else {
+    echo "Aucune donnée trouvée.";
 }
 
 $conn->close();

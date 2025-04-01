@@ -3,57 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <title>Formulaire de Connexion</title>
-    <link rel="stylesheet" href="connexion.css">
+    <link rel="stylesheet" href="">
     <style>
-        /* Styles pour les pop-ups */
-        .popup {
-            display: none;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            padding: 30px;
-            background-color: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px 60px;
             border-radius: 10px;
-            width: 350px;
-            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
-        .popup .close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            font-size: 20px;
+        .form-container label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
         }
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+        .form-container input[type="text"],
+        .form-container input[type="password"] {
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-        .button-container {
-            margin-top: 20px;
-        }
-        .button-container button {
-            margin: 5px;
-            padding: 10px 20px;
-            border: none;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            background: #ff7e5f;
-            color: white;
-            cursor: pointer;
-            transition: background 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .button-container button:hover {
-            background: #feb47b;
-        }
-        .connect-btn, .gestion-btn {
+        .form-container input[type="submit"] {
             width: 100%;
             padding: 10px;
             border: none;
@@ -63,148 +46,830 @@
             font-size: 16px;
             cursor: pointer;
             transition: background 0.3s ease;
-            margin-top: 10px;
         }
-        .connect-btn:hover, .gestion-btn:hover {
+        .form-container input[type="submit"]:hover {
             background: #feb47b;
         }
+        .form-container input[type="button"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #ff8b80;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .form-container input[type="button"]:hover {
+            background: #ff6f61;
+        }
+
+/* Styles spécifiques pour la popup admin */
+#popupAdmin {
+    display: none; /* La popup est masquée par défaut */
+    position: fixed; /* Position fixe par rapport à la fenêtre */
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent pour l'arrière-plan */
+    z-index: 1000; /* Assure que la popup est au-dessus des autres éléments */
+}
+
+#popupAdmin > form {
+    background-color: #fff; /* Fond blanc pour le formulaire */
+    border-radius: 15px; /* Coins arrondis */
+    padding: 30px 50px; /* Espace intérieur pour le contenu */
+    width: 360px; /* Largeur fixe du formulaire */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombrage pour un effet de profondeur */
+    position: absolute; /* Positionné par rapport à l'élément parent */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centre le formulaire */
+    display: flex;
+    flex-direction: column; /* Disposition des éléments en colonne */
+    justify-content: space-between; /* Espacement entre les éléments */
+}
+
+#popupAdmin label {
+    text-align: center; /* Centre le texte */
+    margin-bottom: 15px; /* Espace sous le label */
+    font-size: 1em; /* Taille de la police */
+    font-weight: bold; /* Texte en gras */
+    color: #333; /* Couleur du texte */
+}
+
+#popupAdmin input[type="password"] {
+    width: 100%; /* Largeur complète du champ */
+    padding: 6px; /* Espace intérieur */
+    border: 1px solid #ccc; /* Bordure grise */
+    border-radius: 5px; /* Coins arrondis */
+    margin-bottom: 10px; /* Espace sous le champ */
+    box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur totale */
+    font-size: 1em; /* Taille de la police */
+    text-align: center; /* Centre le texte dans le champ */
+}
+
+#popupAdmin .button-container {
+    display: flex;
+    flex-direction: column; /* Disposition des boutons en colonne */
+    align-items: stretch; /* Les boutons s'étirent pour remplir l'espace */
+    gap: 10px; /* Espace entre les boutons */
+    margin-top: auto; /* Pousse les boutons vers le bas */
+}
+
+#popupAdmin .button-container button {
+    padding: 4px 8px; /* Espace intérieur pour des boutons plus grands */
+    border: none; /* Pas de bordure */
+    border-radius: 10px; /* Coins arrondis */
+    cursor: pointer; /* Curseur de la main pour indiquer un lien */
+    width: 100%; /* Largeur complète */
+    font-size: 1em; /* Taille de la police */
+    font-weight: bold; /* Texte en gras */
+    transition: background-color 0.3s ease; /* Transition douce pour le changement de couleur */
+    box-sizing: border-box; /* Inclut le padding dans la largeur totale */
+}
+
+#popupAdmin .button-container button:first-child {
+    background-color: #FF7F50; /* Couleur de fond orange */
+    color: white; /* Texte blanc */
+}
+
+#popupAdmin .button-container button:first-child:hover {
+    background-color: #FF6347; /* Couleur de fond plus foncée au survol */
+}
+
+#popupAdmin .button-container button:last-child {
+    background-color: #f0f0f0; /* Couleur de fond grise claire */
+    color: #333; /* Texte gris foncé */
+}
+
+#popupAdmin .button-container button:last-child:hover {
+    background-color: #e0e0e0; /* Couleur de fond plus claire au survol */
+}
+
+#popupAdmin .close {
+    position: absolute; /* Positionné par rapport à l'élément parent */
+    top: 10px;
+    right: 10px;
+    background: none; /* Pas de fond */
+    border: none; /* Pas de bordure */
+    font-size: 16px; /* Taille de la police */
+    cursor: pointer; /* Curseur de la main */
+}
+
+
+/* Styles spécifiques pour la popup gestion */
+#popupGestion {
+    display: none; /* Assurez-vous que cette ligne est présente */
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+
+        #popupGestion .modal {
+            background-color: #fff;
+            border-radius: 18px;
+            padding: 18px;
+            width: 320px;
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
+            position: relative;
+            text-align: center;
+            transform: scale(1.1);
+        }
+
+        #popupGestion .modal-header {
+            margin-bottom: 15px;
+            font-size: 1em;
+            font-weight: bold;
+            white-space: nowrap;
+            color: #333;
+        }
+
+        #popupGestion .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        #popupGestion .modal-buttons button {
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+            width: 100%;
+            box-sizing: border-box;
+            color: white;
+            background-color: #FF7F50;
+            transition: background-color 0.3s ease;
+        }
+
+        #popupGestion .modal-buttons button:hover {
+            background-color: #FF6347;
+        }
+
+        #popupGestion .modal-buttons button.cancel {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        #popupGestion .modal-buttons button.cancel:hover {
+            background-color: #e0e0e0;
+        }
+
+        #popupGestion .close-button {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Styles spécifiques pour les popups ajout/modification/suppression */
+        /* Styles spécifiques pour la popup d'ajout */
+        #popupAjout {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #popupAjout .modal {
+            background-color: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            width: 350px;
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
+            position: relative;
+            text-align: center;
+            transform: scale(1.15);
+        }
+
+        #popupAjout .modal-header {
+            margin-bottom: 17px;
+            font-size: 1em;
+            font-weight: bold;
+            white-space: nowrap;
+            color: #000;
+        }
+
+        #popupAjout .modal-body {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            margin-bottom: 17px;
+        }
+
+        #popupAjout .modal-body label {
+            text-align: left;
+            margin-bottom: 7px;
+            font-size: 0.9em;
+            color: #000;
+        }
+
+        #popupAjout .modal-body input {
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            font-size: 0.9em;
+        }
+
+        #popupAjout .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 13px;
+        }
+
+        #popupAjout .modal-buttons button {
+            padding: 9px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        #popupAjout .modal-buttons button.validate {
+            background-color: #FF7F50;
+            color: white;
+        }
+
+        #popupAjout .modal-buttons button.cancel {
+            background-color: #f0f0f0;
+            color: #000;
+        }
+
+        #popupAjout .modal-buttons button:hover {
+            background-color: #FF6347;
+        }
+
+        #popupAjout .modal-buttons button.cancel:hover {
+            background-color: #e0e0e0;
+        }
+
+        #popupAjout .close-button {
+            position: absolute;
+            top: 9px;
+            right: 9px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            color: #000;
+        }
+
+        /* Styles spécifiques pour la popup de modification */
+        #popupModifier {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #popupModifier .modal {
+            background-color: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            width: 350px;
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
+            position: relative;
+            text-align: center;
+            transform: scale(1.15);
+        }
+
+        #popupModifier .modal-header {
+            margin-bottom: 17px;
+            font-size: 1em;
+            font-weight: bold;
+            white-space: nowrap;
+            color: #000;
+        }
+
+        #popupModifier .modal-body {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            margin-bottom: 17px;
+        }
+
+        #popupModifier .modal-body label {
+            text-align: left;
+            margin-bottom: 7px;
+            font-size: 0.9em;
+            color: #000;
+        }
+
+        #popupModifier .modal-body input {
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            font-size: 0.9em;
+        }
+
+        #popupModifier .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 13px;
+        }
+
+        #popupModifier .modal-buttons button {
+            padding: 9px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        #popupModifier .modal-buttons button.validate {
+            background-color: #FF7F50;
+            color: white;
+        }
+
+        #popupModifier .modal-buttons button.cancel {
+            background-color: #f0f0f0;
+            color: #000;
+        }
+
+        #popupModifier .modal-buttons button:hover {
+            background-color: #FF6347;
+        }
+
+        #popupModifier .modal-buttons button.cancel:hover {
+            background-color: #e0e0e0;
+        }
+
+        #popupModifier .close-button {
+            position: absolute;
+            top: 9px;
+            right: 9px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            color: #000;
+        }
+
+        /* Styles spécifiques pour la popup de suppression */
+        #popupSupprimer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #popupSupprimer .modal {
+            background-color: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            width: 350px;
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
+            position: relative;
+            text-align: center;
+            transform: scale(1.15);
+        }
+
+        #popupSupprimer .modal-header {
+            margin-bottom: 17px;
+            font-size: 1em;
+            font-weight: bold;
+            white-space: nowrap;
+            color: #000;
+        }
+
+        #popupSupprimer .modal-body {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            margin-bottom: 17px;
+        }
+
+        #popupSupprimer .modal-body label {
+            text-align: left;
+            margin-bottom: 7px;
+            font-size: 0.9em;
+            color: #000;
+        }
+
+        #popupSupprimer .modal-body input {
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            font-size: 0.9em;
+        }
+
+        #popupSupprimer .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 13px;
+        }
+
+        #popupSupprimer .modal-buttons button {
+            padding: 9px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        #popupSupprimer .modal-buttons button.validate {
+            background-color: #FF7F50;
+            color: white;
+        }
+
+        #popupSupprimer .modal-buttons button.cancel {
+            background-color: #f0f0f0;
+            color: #000;
+        }
+
+        #popupSupprimer .modal-buttons button:hover {
+            background-color: #FF6347;
+        }
+
+        #popupSupprimer .modal-buttons button.cancel:hover {
+            background-color: #e0e0e0;
+        }
+
+        #popupSupprimer .close-button {
+            position: absolute;
+            top: 9px;
+            right: 9px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            color: #000;
+        }
+
+
+/* Nouvelle classe CSS */
+.nouvelle-classe {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: #ff7e5f;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 10px;
+}
+
+/* Style pour le popup */
+.popup {
+    display: none; /* Masque le popup par défaut */
+    position: fixed; /* Positionne le popup par rapport à la fenêtre du navigateur */
+    z-index: 1000; /* Place le popup au premier plan, au-dessus des autres éléments */
+    left: 0; /* Aligne le popup à gauche de la fenêtre */
+    top: 0; /* Aligne le popup en haut de la fenêtre */
+    width: 100%; /* Largeur du popup couvrant toute la fenêtre */
+    height: 100%; /* Hauteur du popup couvrant toute la fenêtre */
+    overflow: auto; /* Ajoute une barre de défilement si le contenu dépasse la taille de la fenêtre */
+    background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent pour obscurcir l'arrière-plan */
+}
+
+/* Style pour le contenu du popup */
+.alert-content {
+    background-color: #fefefe; /* Nouvelle couleur de fond pour le contenu */
+    margin: 20% auto; /* Centre le contenu verticalement et horizontalement */
+    padding: 20px; /* Espace intérieur pour le contenu */
+    border: 1px solid #888; /* Bordure grise autour du contenu */
+    width: 80%; /* Largeur du contenu */
+    max-width: 300px; /* Largeur maximale du contenu */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Ombre pour donner de la profondeur */
+    z-index: 1001; /* Assure que le contenu est au-dessus du fond semi-transparent */
+    height: auto; /* Hauteur automatique pour ajuster le contenu */
+    max-height: 50%; /* Hauteur maximale pour éviter que la popup soit trop grande */
+}
+
+/* Style pour le bouton de fermeture */
+.close {
+    color: #aaa; /* Couleur grise pour le texte de fermeture */
+    float: right; /* Aligne le bouton de fermeture à droite */
+    font-size: 28px; /* Taille de la police pour le bouton de fermeture */
+    font-weight: bold; /* Police en gras pour le bouton de fermeture */
+}
+
+.close:hover,
+.close:focus {
+    color: black; /* Change la couleur en noir au survol ou focus */
+    text-decoration: none; /* Supprime le soulignement au survol ou focus */
+    cursor: pointer; /* Change le curseur en pointeur au survol */
+}
+
+/* Style pour le bouton de validation */
+.validate {
+    background-color: #FF7F50; /* Couleur de fond verte pour le bouton */
+    color: white; /* Couleur du texte blanc */
+    padding: 10px 20px; /* Espace intérieur pour le bouton */
+    border: none; /* Supprime la bordure du bouton */
+    cursor: pointer; /* Change le curseur en pointeur au survol */
+    width: 100%; /* Largeur du bouton couvrant toute la largeur du contenu */
+    margin-top: 10px; /* Espace au-dessus du bouton */
+}
+
+.validate:hover {
+    background-color: #FF6347; /* Change la couleur de fond au survol */
+}
+
+
+
+
     </style>
 </head>
 <body>
 
     <!-- Formulaire de Connexion -->
-    <form action="connexion.php" method="post">
+    <div class="form-container">
+    <form id="loginForm">
         <input type="hidden" name="action" value="login">
         <label for="numero_de_telephone">Numéro de téléphone :</label>
-        <input type="text" id="numero_de_telephone" name="numero_de_telephone" required pattern="[0-9]{10}">
+        <input type="text" id="numero_de_telephone" name="numero_de_telephone" required pattern="[0-9]{10}" placeholder="Numéro de téléphone">
 
         <label for="password">Mot de passe :</label>
-        <input type="password" id="password" name="password" required>
+        <input type="password" id="password" name="password" required placeholder="Mot de passe">
 
         <input type="submit" value="Se connecter" class="connect-btn">
 
-        <!-- Bouton pour gérer les utilisateurs (ouvre une popup) -->
-        <button type="button" class="gestion-btn" onclick="ouvrirPopup('popupAdmin')">Gestion des utilisateurs</button>
+<!-- Bouton pour gérer les utilisateurs (ouvre une popup) -->
+<button type="button" class="gestion-btn nouvelle-classe" onclick="ouvrirPopup('popupAdmin')">Gestion des utilisateurs</button>
+
     </form>
 
     <!-- Overlay pour les pop-ups -->
     <div id="overlay" class="overlay" onclick="fermerPopupTous()"></div>
 
-    <!-- Popup de validation pour l'accès admin -->
-    <div id="popupAdmin" class="popup">
+<!-- Popup de validation pour l'accès admin -->
+<div id="popupAdmin" class="popup">
+    <form id="adminForm">
         <span class="close" onclick="fermerPopup('popupAdmin')">&times;</span>
-        <form id="adminForm" action="connexion.php" method="post" onsubmit="return verifierAdmin();">
-            <input type="hidden" name="action" value="admin">
-            <label for="mdp_admin">Mot de passe admin :</label>
-            <input type="password" id="mdp_admin" name="mdp_admin" required>
-            <div class="button-container">
-                <input type="submit" value="Valider">
-                <button type="button" onclick="fermerPopup('popupAdmin')">Annuler</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Popup pour gérer Ajout / Modification / Suppression -->
-    <div id="popupGestion" class="popup">
-        <span class="close" onclick="fermerPopup('popupGestion')">&times;</span>
+        <input type="hidden" name="action" value="admin">
+        <label for="mdp_admin">Mot de passe administrateur :</label>
+        <input type="password" id="mdp_admin" name="mdp_admin" required placeholder="Mot de passe">
         <div class="button-container">
-            <button onclick="ouvrirFormPopup('ajout')">Ajouter un utilisateur</button>
-            <button onclick="ouvrirFormPopup('modifier')">Modifier un utilisateur</button>
-            <button onclick="ouvrirFormPopup('supprimer')">Supprimer un utilisateur</button>
-            <button type="button" onclick="fermerPopup('popupGestion')">Annuler</button>
+            <button type="submit">Valider</button>
+            <button type="button" onclick="fermerPopup('popupAdmin')">Annuler</button>
+        </div>
+    </form>
+</div>
+
+
+<!-- Popup pour gérer Ajout / Modification / Suppression -->
+<div id="popupGestion" class="modal-overlay">
+    <div class="modal">
+        <button class="close-button" onclick="fermerPopup('popupGestion')">&times;</button>
+        <div class="modal-header">Gestion des utilisateurs</div>
+        <div class="modal-buttons">
+            <button type="button" onclick="ouvrirFormPopup('ajout')">Ajouter un utilisateur</button>
+            <button type="button" onclick="ouvrirFormPopup('modifier')">Modifier un utilisateur</button>
+            <button type="button" onclick="ouvrirFormPopup('supprimer')">Supprimer un utilisateur</button>
+            <button type="button" class="cancel" onclick="fermerPopup('popupGestion')">Annuler</button>
         </div>
     </div>
+</div>
 
-    <!-- Formulaire Ajout Utilisateur -->
-    <div id="popupAjout" class="popup">
-        <span class="close" onclick="fermerPopup('popupAjout')">&times;</span>
-        <form action="connexion.php" method="post">
+<!-- Formulaire Ajout Utilisateur -->
+<div id="popupAjout" class="modal-overlay">
+    <div class="modal">
+        <button class="close-button" onclick="fermerPopup('popupAjout')">&times;</button>
+        <div class="modal-header">Ajouter un utilisateur</div>
+        <form id="ajoutForm">
             <input type="hidden" name="action" value="ajout">
+            <div class="modal-body">
+                <label for="numero">Numéro de téléphone :</label>
+                <input type="text" id="numero" name="numero" required pattern="[0-9]{10}" placeholder="Numéro de téléphone">
 
-            <label for="numero">Numéro de téléphone :</label>
-            <input type="text" id="numero" name="numero" required pattern="[0-9]{10}">
+                <label for="conf_numero">Confirmer le numéro :</label>
+                <input type="text" id="conf_numero" name="conf_numero" required pattern="[0-9]{10}" placeholder="Confirmer le numéro">
 
-            <label for="conf_numero">Confirmer le numéro :</label>
-            <input type="text" id="conf_numero" name="conf_numero" required pattern="[0-9]{10}">
+                <label for="password">Mot de passe :</label>
+                <input type="password" id="password" name="password" required placeholder="Mot de passe">
 
-            <label for="password">Mot de passe :</label>
-            <input type="password" id="password" name="password" required>
+                <label for="conf_password">Confirmer le mot de passe :</label>
+                <input type="password" id="conf_password" name="conf_password" required placeholder="Confirmer le mot de passe">
+            </div>
+            <div class="modal-buttons">
+                <button type="submit" class="validate" onclick="fermerPopup('popupAjout')">Ajouter</button>
+                <button type="button" class="cancel" onclick="fermerPopup('popupAjout')">Annuler</button>
+                
 
-            <label for="conf_password">Confirmer le mot de passe :</label>
-            <input type="password" id="conf_password" name="conf_password" required>
-
-            <div class="button-container">
-                <input type="submit" value="Ajouter">
-                <button type="button" onclick="fermerPopup('popupAjout')">Annuler</button>
             </div>
         </form>
     </div>
+</div>
 
-    <!-- Formulaire Modification Utilisateur -->
-    <div id="popupModifier" class="popup">
-        <span class="close" onclick="fermerPopup('popupModifier')">&times;</span>
-        <form action="connexion.php" method="post">
+<!-- Formulaire Modification Utilisateur -->
+<div id="popupModifier" class="modal-overlay">
+    <div class="modal">
+        <button class="close-button" onclick="fermerPopup('popupModifier')">&times;</button>
+        <div class="modal-header">Modifier le mot de passe</div>
+        <form id="modifierForm">
             <input type="hidden" name="action" value="modifier">
+            <div class="modal-body">
+                <label for="num_modif">Numéro de téléphone :</label>
+                <input type="text" id="num_modif" name="numero" required pattern="[0-9]{10}" placeholder="Numéro de téléphone">
 
-            <label for="num_modif">Numéro de téléphone :</label>
-            <input type="text" id="num_modif" name="numero" required pattern="[0-9]{10}">
+                <label for="ancien_password">Mot de passe actuel :</label>
+                <input type="password" id="ancien_password" name="ancien_password" required placeholder="Mot de passe actuel">
 
-            <label for="ancien_password">Mot de passe actuel :</label>
-            <input type="password" id="ancien_password" name="ancien_password" required>
+                <label for="new_password">Nouveau mot de passe :</label>
+                <input type="password" id="new_password" name="new_password" required placeholder="Nouveau mot de passe">
 
-            <label for="new_password">Nouveau mot de passe :</label>
-            <input type="password" id="new_password" name="new_password" required>
-
-            <label for="conf_new_password">Confirmer le nouveau mot de passe :</label>
-            <input type="password" id="conf_new_password" name="conf_new_password" required>
-
-            <div class="button-container">
-                <input type="submit" value="Modifier">
-                <button type="button" onclick="fermerPopup('popupModifier')">Annuler</button>
+                <label for="conf_new_password">Confirmer le nouveau mot de passe :</label>
+                <input type="password" id="conf_new_password" name="conf_new_password" required placeholder="Confirmer le nouveau mot de passe">
+            </div>
+            <div class="modal-buttons">
+                <button type="submit" class="validate" onclick="fermerPopup('popupAjout')">Modifier</button>
+                <button type="button" class="cancel" onclick="fermerPopup('popupModifier')">Annuler</button>
             </div>
         </form>
     </div>
+</div>
 
-    <!-- Formulaire Suppression Utilisateur -->
-    <div id="popupSupprimer" class="popup">
-        <span class="close" onclick="fermerPopup('popupSupprimer')">&times;</span>
-        <form action="connexion.php" method="post">
+<!-- Formulaire Suppression Utilisateur -->
+<div id="popupSupprimer" class="modal-overlay">
+    <div class="modal">
+        <button class="close-button" onclick="fermerPopup('popupSupprimer')">&times;</button>
+        <div class="modal-header">Supprimer un utilisateur</div>
+        <form id="supprimerForm">
             <input type="hidden" name="action" value="supprimer">
+            <div class="modal-body">
+                <label for="num_supp">Numéro de téléphone :</label>
+                <input type="text" id="num_supp" name="numero" required pattern="[0-9]{10}" placeholder="Numéro de téléphone">
 
-            <label for="num_supp">Numéro de téléphone :</label>
-            <input type="text" id="num_supp" name="numero" required pattern="[0-9]{10}">
+                <label for="conf_num_supp">Confirmer le numéro :</label>
+                <input type="text" id="conf_num_supp" name="conf_numero" required pattern="[0-9]{10}" placeholder="Confirmer le numéro">
 
-            <label for="conf_num_supp">Confirmer le numéro :</label>
-            <input type="text" id="conf_num_supp" name="conf_numero" required pattern="[0-9]{10}">
+                <label for="password_supp">Mot de passe actuel :</label>
+                <input type="password" id="password_supp" name="password" required placeholder="Mot de passe actuel">
 
-            <label for="password_supp">Mot de passe actuel :</label>
-            <input type="password" id="password_supp" name="password" required>
-
-            <label for="conf_password_supp">Confirmer le mot de passe :</label>
-            <input type="password" id="conf_password_supp" name="conf_password" required>
-
-            <div class="button-container">
-                <input type="submit" value="Supprimer">
-                <button type="button" onclick="fermerPopup('popupSupprimer')">Annuler</button>
+                <label for="conf_password_supp">Confirmer le mot de passe :</label>
+                <input type="password" id="conf_password_supp" name="conf_password" required placeholder="Confirmer le mot de passe">
+            </div>
+            <div class="modal-buttons">
+                <button type="submit" class="validate" onclick="fermerPopup('popupAjout')">Supprimer</button>
+                <button type="button" class="cancel" onclick="fermerPopup('popupSupprimer')">Annuler</button>
             </div>
         </form>
     </div>
+</div>
+
+<!-- Popup de confirmation -->
+<!-- Popup d'alerte -->
+<div id="alertPopup" class="popup">
+    <div class="alert-content">
+        <span class="close" onclick="fermerPopup('alertPopup')">&times;</span>
+        <div id="alertMessage">Ceci est un message d'alerte.</div>
+        <button type="button" class="validate" onclick="fermerPopup('alertPopup')">OK</button>
+    </div>
+</div>
+
+
+
 
     <script>
+window.onload = function() {
+    // Assurez-vous que toutes les popups sont fermées au chargement de la page
+    fermerPopupTous();
+};
+
+
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            handleFormSubmit(this, 'données_physico_chimiques.php');
+        });
+
+        document.getElementById('adminForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            handleFormSubmit(this, null, 'popupGestion');
+        });
+
+        document.getElementById('ajoutForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            handleFormSubmit(this);
+        });
+
+        document.getElementById('modifierForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            handleFormSubmit(this);
+        });
+
+        document.getElementById('supprimerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            handleFormSubmit(this);
+        });
+
+function handleFormSubmit(form, redirectUrl = null, popupId = null) {
+    var formData = new FormData(form);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "connexion.php", true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            if (response.success) {
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                } else if (popupId) {
+                    fermerPopup(form.closest('.popup').id);
+                    ouvrirPopup(popupId);
+                } else {
+                    // Afficher un message de confirmation générique dans la popup d'alerte
+                    var action = form.querySelector('input[name="action"]').value;
+                    var message = "L'utilisateur a bien été ";
+                    switch(action) {
+                        case 'ajout':
+                            message += "ajouté.";
+                            break;
+                        case 'modifier':
+                            message += "modifié.";
+                            break;
+                        case 'supprimer':
+                            message += "supprimé.";
+                            break;
+                        default:
+                            message = response.message || "Opération réussie.";
+                    }
+                    ouvrirAlertPopup(message);
+                }
+            } else {
+                // Afficher un message d'erreur dans la popup d'alerte
+                ouvrirAlertPopup(response.message || "Une erreur est survenue.");
+            }
+        }
+    };
+    xhr.send(formData);
+}
+
+function ouvrirAlertPopup(message) {
+    document.getElementById('alertMessage').textContent = message;
+    document.getElementById('alertPopup').style.display = 'flex';
+}
+
+function fermerPopup(popupId) {
+    document.getElementById(popupId).style.display = 'none';
+}
+
+
         function ouvrirPopup(popupId) {
-            document.body.classList.add('flou'); // Ajoute le flou au corps de la page
+            document.body.classList.add('flou');
             document.getElementById("overlay").style.display = "block";
-            document.getElementById(popupId).style.display = "block";
+            document.getElementById(popupId).style.display = "flex";
         }
 
         function fermerPopup(popupId) {
-            document.body.classList.remove('flou'); // Retire le flou du corps de la page
+            document.body.classList.remove('flou');
             document.getElementById(popupId).style.display = "none";
             document.getElementById("overlay").style.display = "none";
         }
 
         function fermerPopupTous() {
-            const popups = document.querySelectorAll('.popup');
+            const popups = document.querySelectorAll('.popup, .modal-overlay');
             popups.forEach(function(popup) {
                 popup.style.display = 'none';
             });
@@ -213,29 +878,11 @@
         }
 
         function ouvrirFormPopup(type) {
+            fermerPopupTous();
             document.getElementById("overlay").style.display = "block";
-            document.getElementById("popupGestion").style.display = "none";
-            document.getElementById("popup" + type.charAt(0).toUpperCase() + type.slice(1)).style.display = "block";
+            document.getElementById("popup" + type.charAt(0).toUpperCase() + type.slice(1)).style.display = "flex";
         }
 
-        function verifierAdmin() {
-            var mdpAdmin = document.getElementById("mdp_admin").value;
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "connexion.php", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    if (xhr.responseText.includes("Mot de passe admin incorrect")) {
-                        alert("Mot de passe admin incorrect");
-                    } else {
-                        fermerPopup('popupAdmin');
-                        ouvrirPopup('popupGestion');
-                    }
-                }
-            };
-            xhr.send("action=admin&mdp_admin=" + encodeURIComponent(mdpAdmin));
-            return false;
-        }
     </script>
 
 </body>

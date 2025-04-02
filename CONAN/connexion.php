@@ -10,7 +10,7 @@ $DATABASE_PORT = '9999';
 // Connexion à la base de données
 $conn = new mysqli($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASSWORD, $DATABASE_NAME, $DATABASE_PORT);
 if ($conn->connect_error) {
-    die("Erreur de connexion : " . $conn->connect_error);
+    die(json_encode(["success" => false, "message" => "Erreur de connexion à la base de données."]));
 }
 
 // Vérification du type de requête
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 supprimerUtilisateur($conn);
                 break;
             default:
-                echo "Action non reconnue.";
+                echo json_encode(["success" => false, "message" => "Action non reconnue."]);
         }
     }
 }
@@ -55,19 +55,16 @@ function login($conn) {
             $stmt->fetch();
 
             if (password_verify($password, $hashed_password)) {
-                $_SESSION['technicien_id'] = $technicien_id; // Stocker l'ID du technicien dans la session
-                header("Location: données_physico_chimiques.php");
+                $_SESSION['technicien_id'] = $technicien_id;
+                echo json_encode(["success" => true]);
                 exit();
-            } else {
-                echo "Mot de passe incorrect.";
             }
-        } else {
-            echo "Numéro de téléphone incorrect.";
         }
 
+        echo json_encode(["success" => false, "message" => "Identifiants incorrects."]);
         $stmt->close();
     } else {
-        echo "Erreur de préparation de la requête SQL.";
+        echo json_encode(["success" => false, "message" => "Erreur de préparation de la requête SQL."]);
     }
 }
 
@@ -84,18 +81,17 @@ function verifierAdmin($conn) {
             $stmt->fetch();
 
             if ($mdp_connect !== null && password_verify($mdp_admin, $mdp_connect)) {
-                // Réponse pour indiquer que le mot de passe admin est correct
-                echo "Mot de passe admin correct";
+                echo json_encode(["success" => true]);
             } else {
-                echo "Mot de passe admin incorrect";
+                echo json_encode(["success" => false, "message" => "Mot de passe incorrect."]);
             }
         } else {
-            echo "Admin non trouvé.";
+            echo json_encode(["success" => false, "message" => "Mot de passe incorrect."]);
         }
 
         $stmt->close();
     } else {
-        echo "Erreur de préparation de la requête SQL.";
+        echo json_encode(["success" => false, "message" => "Erreur de préparation de la requête SQL."]);
     }
 }
 
@@ -116,12 +112,31 @@ function ajoutUtilisateur($conn) {
     $password = $_POST['password'];
     $conf_password = $_POST['conf_password'];
 
-    if ($numero !== $conf_numero || $password !== $conf_password) {
-        die("Les numéros de téléphone ou mots de passe ne correspondent pas.");
+    if ($numero !== $conf_numero) {
+        echo json_encode(["success" => false, "message" => "Les numéros de téléphone ne correspondent pas."]);
+        exit();
+    }
+
+    if ($password !== $conf_password) {
+        echo json_encode(["success" => false, "message" => "Les mots de passe ne correspondent pas."]);
+        exit();
     }
 
     if (!validerMotDePasse($password)) {
-        die("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.");
+        echo json_encode(["success" => false, "message" => "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial."]);
+        exit();
+    }
+
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM Technicien WHERE numero_de_telephone = ?");
+    $stmt->bind_param("s", $numero);
+    $stmt->execute();
+    $stmt->store_result();
+    $stmt->bind_result($count);
+    $stmt->fetch();
+
+    if ($count > 0) {
+        echo json_encode(["success" => false, "message" => "Numéro de téléphone déjà existant."]);
+        exit();
     }
 
     $hash = password_hash($password, PASSWORD_BCRYPT);
@@ -129,9 +144,9 @@ function ajoutUtilisateur($conn) {
     $stmt->bind_param("ss", $numero, $hash);
 
     if ($stmt->execute()) {
-        echo "Utilisateur ajouté avec succès.";
+        echo json_encode(["success" => true, "message" => "Utilisateur ajouté avec succès."]);
     } else {
-        echo "Erreur : " . $stmt->error;
+        echo json_encode(["success" => false, "message" => "Erreur lors de l'ajout de l'utilisateur."]);
     }
 
     $stmt->close();
@@ -144,11 +159,13 @@ function modifierUtilisateur($conn) {
     $conf_new_password = $_POST['conf_new_password'];
 
     if ($new_password !== $conf_new_password) {
-        die("Les nouveaux mots de passe ne correspondent pas.");
+        echo json_encode(["success" => false, "message" => "Les nouveaux mots de passe ne correspondent pas."]);
+        exit();
     }
 
     if (!validerMotDePasse($new_password)) {
-        die("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.");
+        echo json_encode(["success" => false, "message" => "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial."]);
+        exit();
     }
 
     $stmt = $conn->prepare("SELECT mot_de_passe FROM Technicien WHERE numero_de_telephone = ?");
@@ -157,14 +174,16 @@ function modifierUtilisateur($conn) {
     $stmt->store_result();
 
     if ($stmt->num_rows === 0) {
-        die("Numéro de téléphone non trouvé.");
+        echo json_encode(["success" => false, "message" => "Identifiants incorrects."]);
+        exit();
     }
 
     $stmt->bind_result($hashed_password);
     $stmt->fetch();
 
     if (!password_verify($ancien_password, $hashed_password)) {
-        die("Mot de passe actuel incorrect.");
+        echo json_encode(["success" => false, "message" => "Identifiants incorrects."]);
+        exit();
     }
 
     $stmt->close();
@@ -174,9 +193,9 @@ function modifierUtilisateur($conn) {
     $stmt->bind_param("ss", $new_hash, $numero);
 
     if ($stmt->execute()) {
-        echo "Mot de passe mis à jour.";
+        echo json_encode(["success" => true, "message" => "Mot de passe mis à jour."]);
     } else {
-        echo "Erreur : " . $stmt->error;
+        echo json_encode(["success" => false, "message" => "Erreur lors de la mise à jour du mot de passe."]);
     }
 
     $stmt->close();
@@ -188,12 +207,14 @@ function supprimerUtilisateur($conn) {
     $password = $_POST['password'];
     $conf_password = $_POST['conf_password'];
 
-    if ($numero !== $conf_numero || $password !== $conf_password) {
-        die("Les informations saisies ne correspondent pas.");
+    if ($numero !== $conf_numero) {
+        echo json_encode(["success" => false, "message" => "Numéro de téléphone ou mot de passe incorrect."]);
+        exit();
     }
 
-    if (!validerMotDePasse($password)) {
-        die("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.");
+    if ($password !== $conf_password) {
+        echo json_encode(["success" => false, "message" => "Numéro de téléphone ou mot de passe incorrect."]);
+        exit();
     }
 
     $stmt = $conn->prepare("SELECT mot_de_passe FROM Technicien WHERE numero_de_telephone = ?");
@@ -202,14 +223,16 @@ function supprimerUtilisateur($conn) {
     $stmt->store_result();
 
     if ($stmt->num_rows === 0) {
-        die("Numéro de téléphone non trouvé.");
+        echo json_encode(["success" => false, "message" => "Numéro inexistant."]);
+        exit();
     }
 
     $stmt->bind_result($hashed_password);
     $stmt->fetch();
 
     if (!password_verify($password, $hashed_password)) {
-        die("Mot de passe incorrect.");
+        echo json_encode(["success" => false, "message" => "Numéro de téléphone ou mot de passe incorrect."]);
+        exit();
     }
 
     $stmt->close();
@@ -218,9 +241,9 @@ function supprimerUtilisateur($conn) {
     $stmt->bind_param("s", $numero);
 
     if ($stmt->execute()) {
-        echo "Utilisateur supprimé avec succès.";
+        echo json_encode(["success" => true, "message" => "Utilisateur supprimé avec succès."]);
     } else {
-        echo "Erreur : " . $stmt->error;
+        echo json_encode(["success" => false, "message" => "Erreur lors de la suppression de l'utilisateur."]);
     }
 
     $stmt->close();

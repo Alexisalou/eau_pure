@@ -27,6 +27,8 @@ ChartJS.register(
 const DonneesPhysicoChimiques = () => {
   const [rawData, setRawData] = useState(null);
   const [stations, setStations] = useState([]);
+  const [selectedRiver, setSelectedRiver] = useState('');
+  const [popupContent, setPopupContent] = useState('');
   const mapRef = useRef(null);
 
   useEffect(() => {
@@ -41,7 +43,7 @@ const DonneesPhysicoChimiques = () => {
 
     const fetchStations = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/stations');
+        const response = await axios.get('http://localhost:3001/api');
         setStations(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des stations :', error);
@@ -52,39 +54,69 @@ const DonneesPhysicoChimiques = () => {
     fetchStations();
   }, []);
 
-  useEffect(() => {
-    if (!mapRef.current) {
-      mapRef.current = L.map('map').setView([46.6031, 1.8883], 6);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(mapRef.current);
-    }
-  }, []);
+  // Récupérer les noms des rivières uniques
+  const riverNames = [...new Set(stations.map(station => station.riviere))];
 
   useEffect(() => {
-    if (mapRef.current && stations.length > 0) {
+    if (!mapRef.current) {
+      const map = L.map('map').setView([46.6031, 1.8883], 6);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+      mapRef.current = map;
+    }
+
+    const map = mapRef.current;
+
+    // Supprimer tous les anciens marqueurs à chaque rendu
+    map.eachLayer(layer => {
+      if (layer instanceof L.Marker) {
+        map.removeLayer(layer);
+      }
+    });
+
+    // Ajouter les marqueurs à la carte en fonction des stations et des données
+    if (stations.length > 0 && rawData) {
       stations.forEach(station => {
         if (station.latitude && station.longitude) {
-          const marker = L.marker([station.latitude, station.longitude]).addTo(mapRef.current);
-          let popupContent = `<strong>Rivière:</strong> ${station.riviere}<br>`;
-          if (station.analyses.length > 0) {
-            station.analyses.forEach(analyse => {
-              popupContent += `<strong>${analyse.type}:</strong> ${analyse.valeur} ${analyse.unite}<br>`;
+          const marker = L.marker([station.latitude, station.longitude], {
+            icon: L.icon({
+              iconUrl: 'https://cdn-icons-png.flaticon.com/32/684/684908.png',
+              iconSize: [32, 32],
+              iconAnchor: [16, 32],
+              popupAnchor: [0, -32],
+            })
+          }).addTo(map);
+
+          marker.on('click', () => {
+            const latestData = rawData.filter(data => data.latitude === station.latitude && data.longitude === station.longitude)
+              .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Trouver les dernières données pour chaque paramètre
+            let popupContent = `<strong>Rivière:</strong> ${station.riviere}<br>`;
+            const parameters = ['ph', 'conductivite', 'dco', 'oxygene', 'turbidite'];
+            parameters.forEach(param => {
+              const value = latestData.find(data => data.type === param);
+              if (value) {
+                popupContent += `<strong>${param.toUpperCase()}:</strong> ${value.valeur} ${value.unite}<br>`;
+              }
             });
-          } else {
-            popupContent += 'Aucune analyse disponible.';
-          }
-          marker.bindPopup(popupContent);
+
+            // Afficher les données dans le popup
+            setPopupContent(popupContent);
+            marker.bindPopup(popupContent).openPopup();
+          });
         }
       });
     }
-  }, [stations]);
+  }, [stations, rawData]);  // Effect se déclenche à chaque changement de données
 
-  const generateChartData = (type) => {
+  const generateChartData = (type, river) => {
     if (!rawData) return { labels: [], datasets: [] };
-    const labels = [...new Set(rawData.map(item => item.date))].sort();
+    const filteredData = rawData.filter(item => item.riviere === river);
+    const labels = [...new Set(filteredData.map(item => item.date))].sort();
     const dataset = labels.map(date => {
-      const item = rawData.find(d => d.date === date && d.type === type);
+      const item = filteredData.find(d => d.date === date && d.type === type);
       return item ? item.valeur : null;
     });
     return {
@@ -136,13 +168,27 @@ const DonneesPhysicoChimiques = () => {
 
   return (
     <div>
-      <h2>Graphiques des données physico-chimiques</h2>
-      <Line data={generateChartData('ph')} options={chartOptions('pH', 0, 14)} />
-      <Line data={generateChartData('conductivite')} options={chartOptions('Conductivité (µS/cm)', 0.05, 10000)} />
-      <Line data={generateChartData('turbidite')} options={chartOptions('Turbidité (NTU)', 0, 1000)} />
-      <Line data={generateChartData('oxygene')} options={chartOptions('Oxygène (mg/L)', 0, 14)} />
-      <Line data={generateChartData('dco')} options={chartOptions('DCO (mg/L)', 0, 1000)} />
-      <div id="map" style={{ height: '500px', marginTop: '20px' }}></div>
+      <div id="map" style={{ height: '500px', marginBottom: '20px' }}></div>
+
+      <h2>Sélectionnez une rivière pour voir les graphiques</h2>
+      <select onChange={(e) => setSelectedRiver(e.target.value)} value={selectedRiver}>
+        <option value="">Sélectionner une rivière</option>
+        {riverNames.map((river, index) => (
+          <option key={index} value={river}>{river}</option>
+        ))}
+      </select>
+
+      {selectedRiver && (
+        <>
+          <h2>Graphiques des données physico-chimiques - {selectedRiver}</h2>
+          <Line data={generateChartData('ph', selectedRiver)} options={chartOptions('pH', 0, 14)} />
+          <Line data={generateChartData('conductivite', selectedRiver)} options={chartOptions('Conductivité (µS/cm)', 0.05, 10000)} />
+          <Line data={generateChartData('turbidite', selectedRiver)} options={chartOptions('Turbidité (NTU)', 0, 1000)} />
+          <Line data={generateChartData('oxygene', selectedRiver)} options={chartOptions('Oxygène (mg/L)', 0, 14)} />
+          <Line data={generateChartData('dco', selectedRiver)} options={chartOptions('DCO (mg/L)', 0, 1000)} />
+        </>
+      )}
+
       <div>
         <h2>Données JSON</h2>
         {rawData ? (
@@ -151,6 +197,14 @@ const DonneesPhysicoChimiques = () => {
           <p>Chargement des données...</p>
         )}
       </div>
+
+      {/* Afficher le contenu du popup lorsque l'on clique sur un marqueur */}
+      {popupContent && (
+        <div style={{ marginTop: '20px' }}>
+          <h3>Données récentes pour le marqueur sélectionné</h3>
+          <div>{popupContent}</div>
+        </div>
+      )}
     </div>
   );
 };

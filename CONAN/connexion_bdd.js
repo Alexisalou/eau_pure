@@ -26,14 +26,38 @@ db.connect((err) => {
 // Endpoint API pour récupérer les données physico-chimiques
 app.get('/api/data', (req, res) => {
   const sql = `
-    SELECT a.valeur, a.type, a.unite, e.date
+    SELECT 
+      a.valeur, 
+      a.type, 
+      a.unite, 
+      e.date,
+      s.latitude,
+      s.longitude,
+      s.riviere
     FROM Analyse a
     JOIN Echantillon e ON a.prelevement = e.id
+    JOIN Station s ON s.id = e.station_id
     ORDER BY e.date DESC
   `;
   db.query(sql, (err, results) => {
     if (err) {
       console.error('Erreur lors de la récupération des données:', err);
+      res.status(500).send('Erreur serveur');
+      return;
+    }
+    res.json(results);
+  });
+});
+
+// Endpoint API pour récupérer les stations
+app.get('/api', (req, res) => {
+  const sql = `
+    SELECT latitude, longitude, riviere
+    FROM Station
+  `;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Erreur lors de la récupération des stations:', err);
       res.status(500).send('Erreur serveur');
       return;
     }

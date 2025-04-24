@@ -12,7 +12,7 @@ DATABASE_PORT = '9999'  # Port mysql ouvert sur le serveur
 
 def main():
     # Facteur de conversion pour le pluviomètre SEN0575
-    IMPULSE_TO_RAIN_MM = 0.2794
+    IMPULSE_TO_RAIN_MM = 0.35
 
     # Initialiser le capteur de pluie
     rain_sensor = RainSensor(pin=17, impulse_to_rain_mm=IMPULSE_TO_RAIN_MM)
@@ -27,8 +27,8 @@ def main():
             if datetime.now() - rain_sensor.last_impulse_time > timedelta(minutes=1):
                 total_rainfall_mm = rain_sensor.get_rainfall()
                 current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                Envois_mesures(PLUVIOMETER_SENSOR_ID, total_rainfall_mm, 'mm', current_time)
-                print(f"Envoi des données: {total_rainfall_mm:.2f} mm à {current_time}")
+                Envois_mesures(PLUVIOMETER_SENSOR_ID, total_rainfall_mm, 'L/m²', current_time)
+                print(f"Envoi des données: {total_rainfall_mm:.2f} L/m² à {current_time}")
                 rain_sensor.reset()
                 time.sleep(60)  # Attendre 1 minute avant de reprendre les mesures
 

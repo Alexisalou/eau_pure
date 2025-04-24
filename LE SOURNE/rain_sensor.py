@@ -20,7 +20,7 @@ class RainSensor(Sensor):
             self.rain_count += 1
             self.rainfall_mm += self.impulse_to_rain_mm
             self.last_impulse_time = datetime.now()
-            print(f"Impulsion détectée ! Total : {self.rain_count}, Pluie tombée : {self.rainfall_mm:.2f} mm")
+            print(f"Impulsion détectée ! Total : {self.rain_count}, Pluie tombée : {self.rainfall_mm:.2f} L/m²")
 
         # Mettre à jour l'état précédent
         self.previous_state = current_state

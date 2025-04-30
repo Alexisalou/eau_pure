@@ -39,8 +39,8 @@ Ce projet contient des tests unitaires pour deux modules principaux :
 | Test                          | Description                                          | Résultat attendu    |
 |-------------------------------|------------------------------------------------------|----------------------|
 | `test_send_sms_success`       | SMS envoyé avec succès                              | ✅ Fonction appelée   |
-| `test_send_sms_empty_message` | Message vide, simulation d'erreur API               | ❌ Exception levée    |
-| `test_send_sms_invalid_number`| Numéro invalide, simulation d'erreur                | ❌ Exception levée    |
+| `test_send_sms_empty_message` | Message vide, simulation d'erreur API               | ✅ Exception levée    |
+| `test_send_sms_invalid_number`| Numéro invalide, simulation d'erreur                | ✅ Exception levée    |
 
 ---
 

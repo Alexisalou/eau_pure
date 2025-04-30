@@ -1,65 +1,52 @@
-# 🌦️ Projet de Surveillance Pluviométrique et Limnimétrique
+# ✅ Tests Unitaires — Projet Capteurs & Envoi de SMS
 
-Ce projet utilise des capteurs connectés à un Raspberry Pi pour mesurer :
-- Les précipitations (pluviomètre)
-- Le niveau d’eau (limnimètre)
-Les mesures sont stockées dans une base de données MySQL, et des alertes peuvent être envoyées par SMS via une box 4G Huawei.
+Ce projet contient des tests unitaires pour deux modules principaux :
 
----
-
-## 🧪 Tests unitaires
-
-Les tests sont répartis dans deux fichiers :
-
-- `test_interf.py` → tests des fonctions de base de données
-- `test_api.py` → tests des fonctions d'envoi de SMS
+- `interf.py` : gère la connexion à la base de données pour envoyer et lire des mesures/seuils.
+- `api.py` : envoie des SMS via une box 4G Huawei (API HiLink).
 
 ---
 
-## 💾 Tests pour la base de données (`interf.py`)
+## 🧪 1. Tests de la base de données (`test_interf.py`)
 
-Le fichier `interf.py` contient les fonctions :
-- `Envois_mesures()` : insère une nouvelle mesure dans la base
-- `lire_seuils()` : lit les seuils des capteurs dans la table `Preleveur`
-- `lire_mesures()` : récupère les dernières mesures de chaque capteur
+### ✔️ Fonctions testées :
 
----
+| Fonction              | Description                                   |
+|-----------------------|-----------------------------------------------|
+| `Envois_mesures()`    | Envoie une mesure (valeur, unité, date)       |
+| `lire_seuils()`       | Lit les seuils depuis la base                 |
+| `lire_mesures()`      | Récupère les dernières mesures des capteurs   |
 
-### ✅ Tests réalisés dans `test_interf.py`
+### ✅ Tests réalisés :
 
-| Test                          | Description                                                             | Attendu     |
-|-------------------------------|-------------------------------------------------------------------------|-------------|
-| `test_envois_mesures`         | Teste l’insertion d’une mesure via une base simulée (`mock`)           | ✅ Réussi   |
-| `test_lire_seuils`            | Récupère les seuils de la table `Preleveur`                             | ✅ Réussi   |
-| `test_lire_mesures`           | Lit les dernières mesures du pluviomètre et limnimètre                  | ✅ Réussi   |
-| `test_lire_seuils_erreur`     | 💥 Simule un appel de fonction incorrect (sans paramètre)              | ❌ Échoue   |
-
----
-
-## 📡 Tests pour l'envoi de SMS (`api.py`)
-
-Le fichier `api.py` contient une fonction `send_sms(phone, message)` qui utilise l'API HiLink (Huawei) pour envoyer des SMS via une box 4G.
+| Test                        | Description                                           | Résultat attendu     |
+|-----------------------------|-------------------------------------------------------|-----------------------|
+| `test_envois_mesures`       | Vérifie l'insertion en base                          | ✅ Commit + SQL appelé |
+| `test_lire_seuils`          | Vérifie la lecture correcte des seuils              | ✅ Valeurs lues        |
+| `test_lire_mesures`         | Vérifie la lecture des mesures                      | ✅ Valeurs lues        |
+| `test_envois_mesures_erreur_logique` | Mauvais appel de fonction                     | ❌ Erreur logique attendue |
 
 ---
 
-### ✅ Tests réalisés dans `test_api.py`
+## 📡 2. Tests d’envoi de SMS (`test_api.py`)
 
-| Test                              | Description                                                  | Attendu      |
-|-----------------------------------|--------------------------------------------------------------|--------------|
-| `test_send_sms_success`           | Envoi d'un SMS valide                                        | ✅ Réussi    |
-| `test_send_sms_message_vide`      | Message vide (génère une erreur API)                         | ❌ Échoue    |
-| `test_send_sms_numero_invalide`   | Numéro mal formé (non reconnu par la box)                    | ❌ Échoue    |
+### ✔️ Fonction testée :
+
+- `send_sms(phone, message)` : envoie un SMS via l'API Huawei LTE.
+
+### ✅ Tests réalisés :
+
+| Test                          | Description                                          | Résultat attendu    |
+|-------------------------------|------------------------------------------------------|----------------------|
+| `test_send_sms_success`       | SMS envoyé avec succès                              | ✅ Fonction appelée   |
+| `test_send_sms_empty_message` | Message vide, simulation d'erreur API               | ❌ Exception levée    |
+| `test_send_sms_invalid_number`| Numéro invalide, simulation d'erreur                | ❌ Exception levée    |
 
 ---
 
-## ▶️ Lancer les tests
+## ⚙️ Lancer tous les tests
 
-Exécute les tests avec `pytest` :
+Depuis la racine du projet :
 
 ```bash
-# Tous les tests
-pytest
-
-# Tests spécifiques
-pytest -v test_interf.py
-pytest -v test_api.py
+pytest -v

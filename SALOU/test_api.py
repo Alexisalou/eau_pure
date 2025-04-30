@@ -1,50 +1,46 @@
 import pytest
 from unittest.mock import patch, MagicMock
-import builtins
+from api import send_sms
 
-# On simule ici la structure du fichier api.py
-# Le but est de tester la fonction `send_sms` sans avoir besoin de la box 4G
+# Test : SMS envoyé avec succès
+@patch('api.Client')
+@patch('api.Connection')
+def test_send_sms_success(mock_connection, mock_client_class):
+    # Mock de la connexion Huawei
+    mock_client = MagicMock()
+    mock_client.sms.send_sms.return_value = "OK"
+    mock_client_class.return_value = mock_client
 
-# ✅ Test d'envoi réussi
-@patch('huawei_lte_api.Connection')
-@patch('huawei_lte_api.Client')
-def test_send_sms_success(mock_client_class, mock_connection_class):
-    mock_connection_instance = MagicMock()
-    mock_client_instance = MagicMock()
-    
-    mock_connection_class.return_value.__enter__.return_value = mock_connection_instance
-    mock_client_class.return_value = mock_client_instance
+    mock_conn_instance = MagicMock()
+    mock_connection.return_value.__enter__.return_value = mock_conn_instance
 
-    # Appel simulé à l'envoi de SMS
-    from api import send_sms
-    send_sms('+33612345678', 'Test réussi')
+    send_sms('+33612345678', 'Hello')
+    mock_client.sms.send_sms.assert_called_once_with('+33612345678', 'Hello')
 
-    mock_client_instance.sms.send_sms.assert_called_once_with('+33612345678', 'Test réussi')
+# Test : Erreur de contenu vide
+@patch('api.Client')
+@patch('api.Connection')
+def test_send_sms_empty_message(mock_connection, mock_client_class):
+    mock_client = MagicMock()
+    mock_client.sms.send_sms.side_effect = Exception("Message vide")
+    mock_client_class.return_value = mock_client
 
-# ❌ Test avec un message vide
-@patch('huawei_lte_api.Connection')
-@patch('huawei_lte_api.Client')
-def test_send_sms_message_vide(mock_client_class, mock_connection_class):
-    mock_client_instance = MagicMock()
-    mock_connection_class.return_value.__enter__.return_value = MagicMock()
-    mock_client_class.return_value = mock_client_instance
+    mock_conn_instance = MagicMock()
+    mock_connection.return_value.__enter__.return_value = mock_conn_instance
 
-    from api import send_sms
+    with pytest.raises(Exception, match="Message vide"):
+        send_sms('+33612345678', '')
 
-    with pytest.raises(Exception):
-        send_sms('+33612345678', '')  # Message vide non géré dans api.py
+# Test : Numéro invalide
+@patch('api.Client')
+@patch('api.Connection')
+def test_send_sms_invalid_number(mock_connection, mock_client_class):
+    mock_client = MagicMock()
+    mock_client.sms.send_sms.side_effect = Exception("Numéro invalide")
+    mock_client_class.return_value = mock_client
 
-# ❌ Test avec un numéro invalide
-@patch('huawei_lte_api.Connection')
-@patch('huawei_lte_api.Client')
-def test_send_sms_numero_invalide(mock_client_class, mock_connection_class):
-    mock_client_instance = MagicMock()
-    mock_client_instance.sms.send_sms.side_effect = Exception("Numéro invalide")
+    mock_conn_instance = MagicMock()
+    mock_connection.return_value.__enter__.return_value = mock_conn_instance
 
-    mock_connection_class.return_value.__enter__.return_value = MagicMock()
-    mock_client_class.return_value = mock_client_instance
-
-    from api import send_sms
-
-    with pytest.raises(Exception):
-        send_sms('1234', 'Test avec numéro invalide')
+    with pytest.raises(Exception, match="Numéro invalide"):
+        send_sms('INVALID', 'Hello')

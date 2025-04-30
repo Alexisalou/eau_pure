@@ -111,3 +111,14 @@ def test_lire_mesures(mock_connect):
     assert mesure_pluviometre == 12.3
     assert mesure_limnimetre == 4.5
     mock_conn.close.assert_called_once()
+import pytest
+
+def test_envois_mesures_erreur_logique():
+    """
+    Exemple de test erroné : appel incorrect de la fonction Envois_mesures
+    avec un paramètre de type invalide (valeur = string au lieu de float).
+    Ce test échouera car la base de données attend un float pour 'valeur'.
+    """
+    with pytest.raises(Exception):  # On s'attend à une exception
+        interf.Envois_mesures(1, 'dix', 'L/m²', '2025-04-28 10:00:00')
+

@@ -1,38 +1,18 @@
 <?php
 session_start();
+require_once 'interf.php';
 
-$DATABASE_HOST = '10.0.14.4';
-$DATABASE_NAME = 'eau_pure';
-$DATABASE_USER = 'root';
-$DATABASE_PASSWORD = 'ieufdl';
-$DATABASE_PORT = '9999';
+$conn = connectDB();
 
-$conn = new mysqli($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASSWORD, $DATABASE_NAME, $DATABASE_PORT);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Récupérer les rivières depuis la base de données avec leurs ID, latitudes et longitudes
-$rivieres = [];
-$query = "SELECT id, riviere, latitude, longitude FROM Station";
-$result = $conn->query($query);
-
-if ($result) {
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $rivieres[] = $row;
-        }
-    } else {
-        // Ajouter un message par défaut si aucune rivière n'est trouvée
-        $rivieres[] = ["id" => "", "riviere" => "Aucune rivière", "latitude" => "", "longitude" => ""];
-    }
-} else {
-    die("Erreur lors de la récupération des rivières: " . $conn->error);
-}
+// Récupération des rivières
+$rivieres = getRivieres($conn);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $data = [
+    if (!isset($_SESSION['technicien_id'])) {
+        die("ID du technicien non trouvé dans la session.");
+    }
+
+    $analyses = [
         'ph' => ['value' => $_POST['ph'], 'unite' => ''],
         'conductivite' => ['value' => $_POST['conductivite'], 'unite' => 'µS/cm'],
         'turbidite' => ['value' => $_POST['turbidite'], 'unite' => 'NTU'],
@@ -40,44 +20,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'dco' => ['value' => $_POST['dco'], 'unite' => 'mg/L']
     ];
 
-    $preleveur = 2; // Le champ preleveur est toujours à 2
-    $date = $_POST['date']; // Récupérer la date saisie par l'utilisateur
-    $riviere_id = $_POST['riviere']; // Récupérer l'ID de la rivière sélectionnée
+    $date = $_POST['date'];
+    $preleveur = 2;
+    $technicien_id = $_SESSION['technicien_id'];
+    $riviere_id = $_POST['riviere'];
 
-    // Vérifier si l'ID du technicien est dans la session
-    if (!isset($_SESSION['technicien_id'])) {
-        die("ID du technicien non trouvé dans la session.");
-    }
-    $technicien_id = $_SESSION['technicien_id']; // Récupérer l'ID du technicien depuis la session
+    // Insertion dans les tables via les fonctions
+    $prelevement_id = insertEchantillon($conn, $date, $preleveur, $technicien_id, $riviere_id);
+    insertAnalyse($conn, $prelevement_id, $analyses);
 
-    // Insertion dans la table Echantillon avec l'ID de la station
-    $stmt = $conn->prepare("INSERT INTO Echantillon (date, preleveur, technicien, station_id) VALUES (?, ?, ?, ?)");
-    if ($stmt) {
-        $stmt->bind_param('sisi', $date, $preleveur, $technicien_id, $riviere_id);
-        if ($stmt->execute()) {
-            $prelevement = $stmt->insert_id; // Récupérer l'ID auto-incrémenté de la nouvelle ligne insérée
-        } else {
-            die("Erreur d'insertion dans la table Echantillon: " . $stmt->error);
-        }
-        $stmt->close();
-    } else {
-        die("Erreur de préparation de la requête SQL pour Echantillon.");
-    }
-
-    // Insertion dans la table Analyse
-    $stmt = $conn->prepare("INSERT INTO Analyse (prelevement, valeur, unite, type) VALUES (?, ?, ?, ?)");
-    if ($stmt) {
-        foreach ($data as $type => $info) {
-            $stmt->bind_param('idss', $prelevement, $info['value'], $info['unite'], $type);
-            if (!$stmt->execute()) {
-                die("Erreur d'insertion dans la table Analyse: " . $stmt->error);
-            }
-        }
-        $stmt->close();
-        echo "Données insérées avec succès.";
-    } else {
-        echo "Erreur de préparation de la requête SQL pour Analyse.";
-    }
+    echo "Données insérées avec succès.";
 }
 
 $conn->close();

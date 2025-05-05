@@ -1,36 +1,66 @@
 <?php
-session_start();
-require_once 'interf.php';
+function connectDB() {
+    $host = '10.0.14.4';
+    $dbname = 'eau_pure';
+    $user = 'root';
+    $password = 'ieufdl';
+    $port = 9999;
 
-$conn = connectDB();
+    $conn = new mysqli($host, $user, $password, $dbname, $port);
 
-// Récupération des rivières
-$rivieres = getRivieres($conn);
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (!isset($_SESSION['technicien_id'])) {
-        die("ID du technicien non trouvé dans la session.");
+    if ($conn->connect_error) {
+        die("Erreur de connexion : " . $conn->connect_error);
     }
 
-    $analyses = [
-        'ph' => ['value' => $_POST['ph'], 'unite' => ''],
-        'conductivite' => ['value' => $_POST['conductivite'], 'unite' => 'µS/cm'],
-        'turbidite' => ['value' => $_POST['turbidite'], 'unite' => 'NTU'],
-        'oxygene' => ['value' => $_POST['oxygene'], 'unite' => 'mg/L'],
-        'dco' => ['value' => $_POST['dco'], 'unite' => 'mg/L']
-    ];
-
-    $date = $_POST['date'];
-    $preleveur = 2;
-    $technicien_id = $_SESSION['technicien_id'];
-    $riviere_id = $_POST['riviere'];
-
-    // Insertion dans les tables via les fonctions
-    $prelevement_id = insertEchantillon($conn, $date, $preleveur, $technicien_id, $riviere_id);
-    insertAnalyse($conn, $prelevement_id, $analyses);
-
-    echo "Données insérées avec succès.";
+    return $conn;
 }
 
-$conn->close();
+function getRivieres($conn) {
+    $rivieres = [];
+    $sql = "SELECT id, riviere, latitude, longitude FROM Station";
+    $result = $conn->query($sql);
+
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $rivieres[] = $row;
+        }
+    } else {
+        $rivieres[] = ["id" => "", "riviere" => "Aucune rivière", "latitude" => "", "longitude" => ""];
+    }
+
+    return $rivieres;
+}
+
+function insertEchantillon($conn, $date, $preleveur, $technicien_id, $station_id) {
+    $stmt = $conn->prepare("INSERT INTO Echantillon (date, preleveur, station_id) VALUES (?, ?, ?, ?)");
+    if (!$stmt) {
+        die("Erreur préparation Echantillon : " . $conn->error);
+    }
+
+    $stmt->bind_param('sisi', $date, $preleveur, $technicien_id, $station_id);
+
+    if (!$stmt->execute()) {
+        die("Erreur insertion Echantillon : " . $stmt->error);
+    }
+
+    $id = $stmt->insert_id;
+    $stmt->close();
+    return $id;
+}
+
+function insertAnalyse($conn, $prelevement_id, $analyses) {
+    $stmt = $conn->prepare("INSERT INTO Analyse (prelevement, valeur, unite, type) VALUES (?, ?, ?, ?)");
+    if (!$stmt) {
+        die("Erreur préparation Analyse : " . $conn->error);
+    }
+
+    foreach ($analyses as $type => $info) {
+        $stmt->bind_param('idss', $prelevement_id, $info['value'], $info['unite'], $type);
+        if (!$stmt->execute()) {
+            die("Erreur insertion Analyse pour $type : " . $stmt->error);
+        }
+    }
+
+    $stmt->close();
+}
 ?>

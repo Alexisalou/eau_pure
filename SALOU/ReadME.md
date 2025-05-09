@@ -45,9 +45,4 @@ Ce projet contient des tests unitaires pour deux modules principaux :
 
 ---
 
-## ⚙️ Lancer tous les tests
 
-Depuis la racine du projet :
-
-```bash
-pytest -v

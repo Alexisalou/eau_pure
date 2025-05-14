@@ -27,7 +27,7 @@ class WaterLevelSensor(Sensor):
         pin,
         adc_channel,
         v_ref=3.3,
-        correction_factor=1.928 / 0.540,
+        correction_factor=1.954 / 0.488,
         resistance=250,
         min_current=4,
         max_current=20,

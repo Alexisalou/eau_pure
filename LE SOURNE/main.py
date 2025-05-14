@@ -41,8 +41,11 @@ def main():
                     depth = water_level_sensor.calculate_depth(current)
 
                     # Vérifier si le capteur est dans l'eau
-                    if current < 4:
-                        print(f"Erreur : Le capteur limnimètre n'est pas dans l'eau. Courant détecté : {current} mA")
+                    if current < 4 or current < 4.2:
+                        depth = 0
+                        Envois_mesures(LIMNIMETER_SENSOR_ID, depth, 'm', current_time)
+                        print(f"Profondeur envoyée : {depth:.2f} m (V={voltage}V, I= 4 mA)")
+                        print(f"Le capteur limnimètre n'est pas dans l'eau. Courant détecté : 4 mA")
                     else:
                         voltage = round(voltage, 2)
                         current = round(current, 2)

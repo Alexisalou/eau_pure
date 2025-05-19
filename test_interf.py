@@ -111,11 +111,96 @@ def test_lire_mesures(mock_connect):
     assert mesure_pluviometre == 12.3
     assert mesure_limnimetre == 4.5
     mock_conn.close.assert_called_once()
-def test_envois_mesures_erreur_logique():
+
+
+# ===============================================================
+# Test de la fonction envois_mesure mais avec une mauvaise valeur
+# ===============================================================
+
+
+@patch('interf.mysql.connector.connect')
+def test_envois_mesures_mauvaise_valeur(mock_connect):
     """
-     Exemple de test erroné : appel incorrect de la fonction Envois_mesures
-    avec un paramètre de type invalide (valeur = string au lieu de float).
-    Ce test échouera car la base de données attend un float pour 'valeur'.
+    Teste que Envois_mesures lève une exception si la valeur n'est pas convertible en float.
     """
-    with pytest.raises(Exception):  # On s'attend à une exception
+    # Mock de la connexion
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    mock_connect.return_value = mock_conn
+    mock_conn.cursor.return_value = mock_cursor
+    mock_conn.is_connected.return_value = True
+
+    with pytest.raises(Exception):
         interf.Envois_mesures(1, 'dix', 'L/m²', '2025-04-28 10:00:00')
+
+
+# ===============================================
+# Test de la fonction lire_seuils mauvaise valeur
+# ===============================================
+
+@patch('interf.mysql.connector.connect')
+def test_lire_seuils_mauvais_resultats(mock_connect):
+    """
+    Teste que lire_seuils lève une exception si les valeurs récupérées ne correspondent pas à celles attendues.
+    """
+
+    # Création de mocks
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    mock_connect.return_value = mock_conn
+    mock_conn.cursor.return_value = mock_cursor
+
+    # On retourne volontairement des seuils inattendus
+    mock_cursor.fetchone.side_effect = [(15.5,), (7.2,)]
+
+    db_config = {
+        'host': 'localhost',
+        'user': 'root',
+        'password': 'root',
+        'database': 'eau_pure',
+        'port': 3306
+    }
+
+    with pytest.raises(AssertionError):
+        seuil_pluviometre, seuil_limnimetre = interf.lire_seuils(db_config)
+        # Vérifications qui doivent échouer
+        assert seuil_pluviometre == 1.5
+        assert seuil_limnimetre == 0.2
+
+# ===============================================
+# Test de la fonction lire_mesure mauvaise valeur
+# ===============================================
+@patch('interf.mysql.connector.connect')
+def test_lire_mesures_mauvaise_valeur(mock_connect):
+    """
+    Teste que lire_mesures lève une exception si les valeurs récupérées ne correspondent pas aux attentes.
+    Ce test est conçu pour échouer volontairement mais passer car on s'attend à une erreur.
+    """
+
+    # Mocks de la connexion
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+
+    mock_connect.return_value = mock_conn
+    mock_conn.cursor.return_value = mock_cursor
+
+    # Valeurs retournées volontairement "fausses"
+    mock_cursor.fetchone.side_effect = [(12.3,), (4.5,)]
+
+    db_config = {
+        'host': 'localhost',
+        'user': 'root',
+        'password': 'root',
+        'database': 'eau_pure',
+        'port': 3306
+    }
+
+    with pytest.raises(AssertionError):
+        mesure_pluviometre, mesure_limnimetre = interf.lire_mesures(db_config)
+
+        # Ces assertions sont fausses exprès : elles doivent échouer
+        assert mesure_pluviometre == 0.0
+        assert mesure_limnimetre == 0.0
+

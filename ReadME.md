@@ -21,13 +21,13 @@ Ce projet contient des tests unitaires pour deux modules principaux :
 
 | Test                        | Description                                           | Résultat attendu     |
 |-----------------------------|-------------------------------------------------------|-----------------------|
-| `test_envois_mesures`       | Vérifie l'insertion en base                          | ✅ Commit + SQL appelé |
-| `test_lire_seuils`          | Vérifie la lecture correcte des seuils              | ✅ Valeurs lues        |
-| `test_lire_mesures`         | Vérifie la lecture des mesures                      | ✅ Valeurs lues        |
-| `test_envois_mesure_mauvaise_valeur` | Mauvaise valeur de mesure envoyé                   | ✅ Une mauvaise mesure est envoiyé |
-| `test_lire_seuil_mauvais_résultat | Mauvaise lecture du seuil                    | ✅  Mauvais seuil  |
-| `test_lire_mesure_mauvaise_valeur` | Mauvaise lecture de mesure                    |✅ Mauvaise valeur lue |
-| `test_lire_seuil_valeur_nulle` | seuil est nulle                    | ✅  seuil est nulle|
+| `test_envois_mesures`       | Vérifie l'insertion en base (nominal)                         | ✅ Commit + SQL appelé |
+| `test_lire_seuils`          | Vérifie la lecture correcte des seuils (nominal)             | ✅ Valeurs lues        |
+| `test_lire_mesures`         | Vérifie la lecture des mesures (nominal)                     | ✅ Valeurs lues        |
+| `test_envois_mesure_mauvaise_valeur` | Mauvaise valeur de mesure envoyé (erreur)                   | ✅ Une mauvaise mesure est envoiyé |
+| `test_lire_seuil_mauvais_résultat` | Mauvaise lecture du seuil (erreur)                   | ✅  Mauvais seuil  |
+| `test_lire_mesure_mauvaise_valeur` | Mauvaise lecture de mesure (erreur)                   |✅ Mauvaise valeur lue |
+| `test_lire_seuil_valeur_nulle` | seuil est nulle (extrème)                     | ✅  seuil est nulle|
 
 
 ---

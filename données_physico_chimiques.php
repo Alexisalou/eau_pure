@@ -1,18 +1,23 @@
 <?php
 session_start();
-require_once 'interf.php';
 
-$conn = connectDB();
+require_once 'connexion_bdd.php';
 
-// Récupération des rivières
-$rivieres = getRivieres($conn);
+// Récupérer les rivières (stations) depuis la base de données
+$rivieres = [];
+$query = "SELECT id, riviere FROM Station";
+$result = $conn->query($query);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $rivieres[] = $row;
+    }
+} else {
+    $rivieres[] = ["id" => "", "riviere" => "Aucune rivière"];
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (!isset($_SESSION['technicien_id'])) {
-        die("ID du technicien non trouvé dans la session.");
-    }
-
-    $analyses = [
+    $data = [
         'ph' => ['value' => $_POST['ph'], 'unite' => ''],
         'conductivite' => ['value' => $_POST['conductivite'], 'unite' => 'µS/cm'],
         'turbidite' => ['value' => $_POST['turbidite'], 'unite' => 'NTU'],
@@ -21,15 +26,55 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     ];
 
     $date = $_POST['date'];
-    $preleveur = 2;
+    $station_id = intval($_POST['riviere']);
+
+    if (!isset($_SESSION['technicien_id'])) {
+        die("ID du technicien non trouvé dans la session.");
+    }
     $technicien_id = $_SESSION['technicien_id'];
-    $riviere_id = $_POST['riviere'];
 
-    // Insertion dans les tables via les fonctions
-    $prelevement_id = insertEchantillon($conn, $date, $preleveur, $technicien_id, $riviere_id);
-    insertAnalyse($conn, $prelevement_id, $analyses);
+    // Trouver le préleveur associé à la station
+    $stmt = $conn->prepare("SELECT id FROM Preleveur WHERE station = ?");
+    $stmt->bind_param("i", $station_id);
+    $stmt->execute();
+    $result_preleveur = $stmt->get_result();
 
-    echo "Données insérées avec succès.";
+    if ($result_preleveur && $result_preleveur->num_rows > 0) {
+        $preleveur_data = $result_preleveur->fetch_assoc();
+        $preleveur = $preleveur_data['id'];
+    } else {
+        die("Aucun préleveur trouvé pour la rivière sélectionnée.");
+    }
+    $stmt->close();
+
+    // Insertion dans Echantillon
+    $stmt = $conn->prepare("INSERT INTO Echantillon (date, preleveur) VALUES (?, ?)");
+    if ($stmt) {
+        $stmt->bind_param('si', $date, $preleveur);
+        if ($stmt->execute()) {
+            $prelevement = $stmt->insert_id;
+        } else {
+            die("Erreur d'insertion dans la table Echantillon: " . $stmt->error);
+        }
+        $stmt->close();
+    } else {
+        die("Erreur de préparation de la requête SQL pour Echantillon.");
+    }
+
+    // Insertion dans Analyse
+    $stmt = $conn->prepare("INSERT INTO Analyse (prelevement, valeur, unite, type) VALUES (?, ?, ?, ?)");
+    if ($stmt) {
+        foreach ($data as $type => $info) {
+            $stmt->bind_param('idss', $prelevement, $info['value'], $info['unite'], $type);
+            if (!$stmt->execute()) {
+                die("Erreur d'insertion dans la table Analyse: " . $stmt->error);
+            }
+        }
+        $stmt->close();
+        echo "Données insérées avec succès.";
+    } else {
+        echo "Erreur de préparation de la requête SQL pour Analyse.";
+    }
 }
 
 $conn->close();
@@ -41,18 +86,21 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulaire de Données Physico-Chimiques</title>
-    <link rel="stylesheet" href="données_physico_chimiques.css">
+	<link rel="stylesheet" href="données_physico_chimiques.css?v=<?= filemtime(__DIR__ . '/données_physico_chimiques.css') ?>">
+
+
+
 </head>
 <body>
     <div class="container">
-        <h1>Formulaire de Données Physico-Chimiques pour le Traitement des Eaux</h1>
+        <h1>Formulaire de saisie des données physico-chimiques</h1>
         <form action="données_physico_chimiques.php" method="post">
             <div class="form-group">
-                <label for="date">Date:</label>
+                <label for="date">Date :</label>
                 <input type="datetime-local" id="date" name="date" required>
             </div>
             <div class="form-group">
-                <label for="riviere">Rivière:</label>
+                <label for="riviere">Rivière :</label>
                 <select id="riviere" name="riviere" required>
                     <?php if (empty($rivieres)): ?>
                         <option value="">Aucune rivière</option>
@@ -64,8 +112,8 @@ $conn->close();
                 </select>
             </div>
             <div class="form-group">
-                <label for="ph">pH (0-14):</label>
-                <input type="number" step="0.01" id="ph" name="ph" min="0" max="14" required>
+                <label for="ph">pH (0 - 14) :</label>
+                <input type="number" step="1" id="ph" name="ph" min="0" max="14" required>
                 <p class="info">
                     Le pH est une mesure de l'acidité ou de la basicité d'une solution.<br>
                     <strong>Plages de Mesure Typiques :</strong><br>
@@ -77,7 +125,7 @@ $conn->close();
                 </p>
             </div>
             <div class="form-group">
-                <label for="conductivite">Conductivité Électrique (µS/cm) (0.05-10000):</label>
+                <label for="conductivite">Conductivité électrique (µS/cm) (0.05 - 10 000) :</label>
                 <input type="number" step="0.01" id="conductivite" name="conductivite" min="0.05" max="10000" required>
                 <p class="info">
                     La conductivité électrique est une mesure de la capacité de l'eau à conduire un courant électrique.<br>
@@ -91,8 +139,8 @@ $conn->close();
                 </p>
             </div>
             <div class="form-group">
-                <label for="turbidite">Turbidité (NTU) (0-1000):</label>
-                <input type="number" step="0.01" id="turbidite" name="turbidite" min="0" max="1000" required>
+                <label for="turbidite">Turbidité (NTU) (0 - 1 000) :</label>
+                <input type="number" step="1" id="turbidite" name="turbidite" min="0" max="1000" required>
                 <p class="info">
                     La turbidité est une mesure de la clarté de l'eau.<br>
                     <strong>Plages de Mesure Typiques :</strong><br>
@@ -105,8 +153,8 @@ $conn->close();
                 </p>
             </div>
             <div class="form-group">
-                <label for="oxygene">Oxygène Dissous (mg/L) (0-14):</label>
-                <input type="number" step="0.01" id="oxygene" name="oxygene" min="0" max="14" required>
+                <label for="oxygene">Oxygène dissous (mg/L) (0 - 14) :</label>
+                <input type="number" step="1" id="oxygene" name="oxygene" min="0" max="14" required>
                 <p class="info">
                     L'oxygène dissous est une mesure de la quantité d'oxygène présente dans l'eau.<br>
                     <strong>Plages de Mesure Typiques :</strong><br>
@@ -118,8 +166,8 @@ $conn->close();
                 </p>
             </div>
             <div class="form-group">
-                <label for="dco">Demande Chimique en Oxygène (DCO) (mg/L) (0-1000):</label>
-                <input type="number" step="0.01" id="dco" name="dco" min="0" max="1000" required>
+                <label for="dco">Demande chimique en oxygène (mg/L) (0 - 1 000) :</label>
+                <input type="number" step="1" id="dco" name="dco" min="0" max="1000" required>
                 <p class="info">
                     La Demande Chimique en Oxygène (DCO) est une mesure de la quantité d'oxygène nécessaire pour oxyder chimiquement les matières organiques et inorganiques présentes dans l'eau.<br>
                     <strong>Plages de Mesure Typiques :</strong><br>
@@ -136,3 +184,5 @@ $conn->close();
     </div>
 </body>
 </html>
+
+

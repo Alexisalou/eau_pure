@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  bdd:
+    image: mysql:5.7
+    container_name : bdd_tp
+    volumes:
+      - ./bdd:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_ROOT_PASSWORD: ieufdl
+
+  bdd_gui:
+    depends_on:
+      - bdd
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8090:80"
+    environment:
+      PMA_HOST: bdd
+      MYSQL_ROOT_PASSWORD: ieufdl
+
+  web:
+    image: php:8.2-apache
+    container_name : web_tp
+    ports:
+      - "8080:80"
+    depends_on:
+      - bdd
+    volumes:
+      - ./html:/var/www/html

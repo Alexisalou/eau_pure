@@ -24,6 +24,10 @@ Ce projet contient des tests unitaires pour deux modules principaux :
 | `test_envois_mesures`       | Vérifie l'insertion en base                          | ✅ Commit + SQL appelé |
 | `test_lire_seuils`          | Vérifie la lecture correcte des seuils              | ✅ Valeurs lues        |
 | `test_lire_mesures`         | Vérifie la lecture des mesures                      | ✅ Valeurs lues        |
+| `test_envois_mesure_mauvaise_valeur` | Mauvaise valeur de mesure envoyé                   | ✅ Une mauvaise mesure est envoiyé |
+| `test_lire_seuil_mauvais_résultat | Mauvaise lecture du seuil                    | ✅  Mauvais seuil  |
+| `test_lire_mesure_mauvaise_valeur` | Mauvaise lecture de mesure                    |✅ Mauvaise valeur lue |
+| `test_lire_seuil_valeur_nulle` | seuil est nulle                    | ✅  seuil est nulle|
 | `test_lire_mauvaise_mesures` | Mauvaise lecture de mesure                    | ❌ Erreur logique attendue |
 | `test_lire_mauvais_seuil` | Mauvaise lecture du seuil                    | ❌ Erreur logique attendue |
 

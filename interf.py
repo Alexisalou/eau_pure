@@ -50,6 +50,8 @@ def Envois_mesures(capteur, valeur, unite, date):
             cursor.close()
             conn.close()
 
+import mysql.connector
+
 def lire_seuils(db_config):
     db = mysql.connector.connect(
         host=db_config['host'],
@@ -60,20 +62,24 @@ def lire_seuils(db_config):
     )
     cursor = db.cursor()
     
-    # Récupérer le seuil du pluviomètre
+    # Requête seuil pluviomètre
     cursor.execute("SELECT seuil_pluviometre FROM Preleveur")
-    seuil_pluviometre = cursor.fetchone()
-    
-    # Récupérer le seuil du limnimètre
+    seuil_pluviometre_result = cursor.fetchone()
+
+    # Requête seuil limnimètre
     cursor.execute("SELECT seuil_limnimetre FROM Preleveur")
-    seuil_limnimetre = cursor.fetchone()
-    
+    seuil_limnimetre_result = cursor.fetchone()
+
     db.close()
-    
-    if seuil_pluviometre and seuil_limnimetre:
-        return seuil_pluviometre[0], seuil_limnimetre[0]
-    else:
-        raise ValueError("Les seuils nécessaires ne sont pas disponibles.")
+
+    # Vérifie les résultats
+    if not seuil_pluviometre_result or seuil_pluviometre_result[0] is None:
+        raise ValueError("Seuil pluviomètre manquant ou nul")
+
+    if not seuil_limnimetre_result or seuil_limnimetre_result[0] is None:
+        raise ValueError("Seuil limnimètre manquant ou nul")
+
+    return seuil_pluviometre_result[0], seuil_limnimetre_result[0]
 
 def lire_mesures(db_config):
     db = mysql.connector.connect(

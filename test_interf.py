@@ -204,3 +204,28 @@ def test_lire_mesures_mauvaise_valeur(mock_connect):
         assert mesure_pluviometre == 0.0
         assert mesure_limnimetre == 0.0
 
+
+# ===============================================
+# Test de la fonction lire_seuils valeur NONE
+# ===============================================
+@patch('interf.mysql.connector.connect')
+def test_lire_seuils_valeurs_nulles(mock_connect):
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+    mock_connect.return_value = mock_conn
+    mock_conn.cursor.return_value = mock_cursor
+
+    # Retourne des seuils NULL (None)
+    mock_cursor.fetchone.side_effect = [(None,), (None,)]
+
+    db_config = {
+        'host': 'localhost',
+        'user': 'root',
+        'password': 'root',
+        'database': 'eau_pure',
+        'port': 3306
+    }
+
+    with pytest.raises(ValueError, match="pluviomètre"):
+        interf.lire_seuils(db_config)
+

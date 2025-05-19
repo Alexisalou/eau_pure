@@ -28,6 +28,8 @@ def Envois_mesures(capteur, valeur, unite, date):
         )
         cursor = conn.cursor()
         
+        valeur = float(valeur)  # Lève une ValueError si 'valeur' n'est pas un float
+
         # Insertion des données
         cursor.execute('''
         INSERT INTO Mesure (capteur, valeur, unite, date)

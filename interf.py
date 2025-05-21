@@ -11,11 +11,6 @@ DATABASE_PORT = '9999'  # Port mysql ouvert sur le serveur
 PLUVIOMETER_SENSOR_ID = 1
 LIMNIMETER_SENSOR_ID = 2
 
-def generate_fake_data():
-    pluviometer_value = round(random.uniform(0, 20), 2)  # Valeur aléatoire pour le pluviomètre 
-    limnimeter_value = round(random.uniform(0, 10), 2)    # Valeur aléatoire pour le limnimètre 
-    return pluviometer_value, limnimeter_value
-
 def Envois_mesures(capteur, valeur, unite, date):
     try:
         # Connexion à la BDD
@@ -49,8 +44,6 @@ def Envois_mesures(capteur, valeur, unite, date):
         if conn.is_connected():
             cursor.close()
             conn.close()
-
-import mysql.connector
 
 def lire_seuils(db_config):
     db = mysql.connector.connect(

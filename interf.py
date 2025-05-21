@@ -1,6 +1,39 @@
 import mysql.connector
 import random
 from datetime import datetime
+DATABASE_HOST = '10.0.14.4'  
+DATABASE_NAME = 'eau_pure'  
+DATABASE_USER = 'root'  
+DATABASE_PASSWORD = 'ieufdl'
+DATABASE_PORT = 9999  # port doit être un int
+
+def get_sensor_id(station_id, reference):
+    try:
+        conn = mysql.connector.connect(
+            host=DATABASE_HOST,
+            database=DATABASE_NAME,
+            user=DATABASE_USER,
+            password=DATABASE_PASSWORD,
+            port=DATABASE_PORT,
+        )
+        cursor = conn.cursor()
+        query = "SELECT id FROM Capteur WHERE station = %s AND reference = %s"
+        cursor.execute(query, (station_id, reference))
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if result:
+            return result[0]
+        else:
+            raise ValueError(f"Capteur non trouvé pour station={station_id} et reference='{reference}'")
+    except mysql.connector.Error as err:
+        print(f"Erreur base de données: {err}")
+        return None
+
+# Récupérer dynamiquement les IDs
+PLUVIOMETER_SENSOR_ID = get_sensor_id(1, 'PLUVIOMETRE')
+LIMNIMETER_SENSOR_ID = get_sensor_id(1, 'LIMNIMETRE')
+
 
 DATABASE_HOST = '10.0.14.4'  
 DATABASE_NAME = 'eau_pure'  
@@ -8,8 +41,7 @@ DATABASE_USER = 'root'
 DATABASE_PASSWORD = 'ieufdl'
 DATABASE_PORT = '9999'  
 
-PLUVIOMETER_SENSOR_ID = 1
-LIMNIMETER_SENSOR_ID = 2
+
 
 
 def Envois_mesures(capteur, valeur, unite, date):
@@ -93,3 +125,5 @@ def lire_mesures(db_config):
         return mesure_pluviometre[0], mesure_limnimetre[0]
     else:
         raise ValueError("Les mesures nécessaires ne sont pas disponibles.")
+
+

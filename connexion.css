@@ -25,7 +25,7 @@ body {
 
 .form-container input[type="text"],
 .form-container input[type="password"] {
-    width: 100%;
+    width: 95%;
     padding: 10px;
     margin-bottom: 20px;
     border: 1px solid #ccc;
@@ -38,7 +38,7 @@ body {
     padding: 10px;
     border: none;
     border-radius: 5px;
-    background: #add8e6;
+    background: #4682b4;
     color: #fff;
     font-size: 16px;
     cursor: pointer;
@@ -543,7 +543,7 @@ body {
     padding: 10px;
     border: none;
     border-radius: 5px;
-    background: #add8e6;
+    background: #4682b4;
     color: #fff;
     font-size: 16px;
     cursor: pointer;
@@ -551,55 +551,56 @@ body {
     margin-top: 10px;
 }
 
-.popup {
-    display: none;
+.nouvelle-classe:hover {
+    background: #87ceeb;
+}
+
+.message-success {
+	display: none;
     position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.alert-content {
-    background-color: #fefefe;
-    margin: 20% auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    color: #000000;
     padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 300px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    z-index: 1001;
-    height: auto;
-    max-height: 50%;
+    border-radius: 10px;
+    font-family: linear-gradient;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
+.message-success .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 18px;
     font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
+    color: #aaa;
     cursor: pointer;
 }
 
-.validate {
-    background-color: #4682b4;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    width: 100%;
+.message-success .close-btn:hover {
+    color: #000;
+}
+
+.message-success .ok-btn {
     margin-top: 10px;
+    padding: 6px 12px;
+    background-color: #4682b4;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-.validate:hover {
+.message-success .ok-btn:hover {
     background-color: #5f9ea0;
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Formulaire de Connexion</title>
-    <link rel="stylesheet" href="connexion.css">
+    <link rel="stylesheet" href="connexion.css?v=123">
 </head>
 <body>
     <!-- Formulaire de Connexion -->
@@ -69,7 +69,7 @@
                     <input type="text" id="conf_numero" name="conf_numero" required pattern="[0-9]{10}" placeholder="Confirmer le numéro">
 
                     <label for="password">Mot de passe :</label>
-                    <input type="password" id="password" name="password" required placeholder="Mot de passe">
+                    <input type="password" id="passwordAjout" name="password" required placeholder="Mot de passe">
 
                     <label for="conf_password">Confirmer le mot de passe :</label>
                     <input type="password" id="conf_password" name="conf_password" required placeholder="Confirmer le mot de passe">
@@ -103,7 +103,7 @@
                     <input type="password" id="conf_new_password" name="conf_new_password" required placeholder="Confirmer le nouveau mot de passe">
                 </div>
                 <div class="modal-buttons">
-                    <button type="submit" class="validate" onclick="fermerPopup('popupAjout')">Modifier</button>
+                    <button type="submit" class="validate" onclick="fermerPopup('popupModifier')">Modifier</button>
                     <button type="button" class="cancel" onclick="fermerPopup('popupModifier')">Annuler</button>
                 </div>
             </form>
@@ -131,7 +131,7 @@
                     <input type="password" id="conf_password_supp" name="conf_password" required placeholder="Confirmer le mot de passe">
                 </div>
                 <div class="modal-buttons">
-                    <button type="submit" class="validate" onclick="fermerPopup('popupAjout')">Supprimer</button>
+                    <button type="submit" class="validate" onclick="fermerPopup('popupSupprimer')">Supprimer</button>
                     <button type="button" class="cancel" onclick="fermerPopup('popupSupprimer')">Annuler</button>
                 </div>
             </form>
@@ -140,13 +140,13 @@
 
     <!-- Popup de confirmation -->
     <!-- Popup d'alerte -->
-    <div id="alertPopup" class="popup">
-        <div class="alert-content">
-            <span class="close" onclick="fermerPopup('alertPopup')">&times;</span>
-            <div id="alertMessage">Ceci est un message d'alerte.</div>
-            <button type="button" class="validate" onclick="fermerPopup('alertPopup')">OK</button>
-        </div>
-    </div>
+<div id="alertPopup" class="message-success">
+    <span class="close-btn" onclick="fermerPopup('alertPopup')">&times;</span>
+    <div id="alertMessage">Ceci est un message d'alerte.</div>
+    <button type="button" class="ok-btn" onclick="fermerPopup('alertPopup')">OK</button>
+</div>
+
+
 
     <script>
         window.onload = function() {

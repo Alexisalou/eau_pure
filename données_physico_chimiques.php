@@ -276,40 +276,35 @@ $conn->close();
                 info.style.display = "none";
             }
         }
-
-        // Initialisation de la carte Leaflet
-        const map = L.map('map').setView([48.3, -3.1], 6); // Centré approximativement sur la France
-
-        // Ajouter une couche OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-        
-        setTimeout(() => {
-		map.invalidateSize();
-		}, 100);
-
-
-        let marker;
-
-        // Fonction pour gérer le clic sur la carte
-        map.on('click', function(e) {
-            const lat = e.latlng.lat.toFixed(6);
-            const lng = e.latlng.lng.toFixed(6);
-
-            // Si un marqueur existe déjà, on le supprime
-            if (marker) {
-                map.removeLayer(marker);
-            }
-
-            // Ajouter un nouveau marqueur à l'endroit cliqué
-            marker = L.marker([lat, lng]).addTo(map);
-
-            // Remplir les champs hidden du formulaire
-            document.getElementById('latitude').value = lat;
-            document.getElementById('longitude').value = lng;
-        });
     </script>
+    
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const map = L.map('map').setView([48.3, -3.1], 6);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      // Récupérer les données depuis le fichier PHP
+      fetch('get_stations.php')
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(station => {
+            if (station.latitude && station.longitude) {
+              L.marker([station.latitude, station.longitude])
+                .addTo(map)
+                .bindPopup(station.nom ? `<strong>${station.nom}</strong>` : 'Station');
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Erreur lors du chargement des données des stations :', error);
+        });
+    });
+  </script>
 <?php if (!empty($message)): ?>
     <div class="message-success" id="popup-success">
         <span class="close-btn" onclick="closePopup()">&times;</span>
@@ -329,6 +324,5 @@ function closePopup() {
 
 </body>
 </html>
-
 
 

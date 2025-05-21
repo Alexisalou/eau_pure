@@ -45,56 +45,17 @@ def Envois_mesures(capteur, valeur, unite, date):
             cursor.close()
             conn.close()
 
-def lire_seuils(db_config):
-    db = mysql.connector.connect(
-        host=db_config['host'],
-        user=db_config['user'],
-        password=db_config['password'],
-        database=db_config['database'],
-        port=db_config['port']
-    )
-    cursor = db.cursor()
-    
-    # Requête seuil pluviomètre
-    cursor.execute("SELECT seuil_pluviometre FROM Preleveur")
-    seuil_pluviometre_result = cursor.fetchone()
 
-    # Requête seuil limnimètre
-    cursor.execute("SELECT seuil_limnimetre FROM Preleveur")
-    seuil_limnimetre_result = cursor.fetchone()
 
-    db.close()
+db_config = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': 'ieufdl',
+    'database': 'eau_pure',
+    'port': '9999'
+}
+stations = recuperer_technicien_mesure(db_config)
+for station in stations:
+    print(f"Station: {station['id']}, Technicien: {station['numero_de_telephone']} ({station['technicien']})")
 
-    # Vérifie les résultats
-    if not seuil_pluviometre_result or seuil_pluviometre_result[0] is None:
-        raise ValueError("Seuil pluviomètre manquant ou nul")
 
-    if not seuil_limnimetre_result or seuil_limnimetre_result[0] is None:
-        raise ValueError("Seuil limnimètre manquant ou nul")
-
-    return seuil_pluviometre_result[0], seuil_limnimetre_result[0]
-
-def lire_mesures(db_config):
-    db = mysql.connector.connect(
-        host=db_config['host'],
-        user=db_config['user'],
-        password=db_config['password'],
-        database=db_config['database'],
-        port=db_config['port']
-    )
-    cursor = db.cursor()
-    
-    # Récupérer la dernière mesure du pluviomètre
-    cursor.execute("SELECT valeur FROM Mesure WHERE capteur = %s ORDER BY date DESC LIMIT 1", (PLUVIOMETER_SENSOR_ID,))
-    mesure_pluviometre = cursor.fetchone()
-    
-    # Récupérer la dernière mesure du limnimètre
-    cursor.execute("SELECT valeur FROM Mesure WHERE capteur = %s ORDER BY date DESC LIMIT 1", (LIMNIMETER_SENSOR_ID,))
-    mesure_limnimetre = cursor.fetchone()
-    
-    db.close()
-    
-    if mesure_pluviometre and mesure_limnimetre:
-        return mesure_pluviometre[0], mesure_limnimetre[0]
-    else:
-        raise ValueError("Les mesures nécessaires ne sont pas disponibles.")

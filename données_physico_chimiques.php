@@ -281,29 +281,50 @@ $conn->close();
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const map = L.map('map').setView([48.3, -3.1], 6);
+document.addEventListener('DOMContentLoaded', function () {
+    const map = L.map('map').setView([48.3, -3.1], 6);
+    const select = document.getElementById('riviere');
+    let marker = null;
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
-      }).addTo(map);
+    }).addTo(map);
 
-      // Récupérer les données depuis le fichier PHP
-      fetch('get_stations.php')
-        .then(response => response.json())
-        .then(data => {
-          data.forEach(station => {
-            if (station.latitude && station.longitude) {
-              L.marker([station.latitude, station.longitude])
-                .addTo(map)
-                .bindPopup(station.nom ? `<strong>${station.nom}</strong>` : 'Station');
-            }
-          });
-        })
-        .catch(error => {
-          console.error('Erreur lors du chargement des données des stations :', error);
-        });
+    function updateMapWithStation(id) {
+        fetch(`données_stations.php?id=${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.latitude && data.longitude) {
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    marker = L.marker([data.latitude, data.longitude])
+                        .addTo(map)
+                        .bindPopup(data.nom || 'Station sélectionnée')
+                        .openPopup();
+                    map.setView([data.latitude, data.longitude], 12);
+                } else {
+                    console.error('Coordonnées non valides ou station introuvable.');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement de la station :', error);
+            });
+    }
+
+    // Mettre à jour la carte au changement de sélection
+    select.addEventListener('change', function () {
+        const stationId = this.value;
+        if (stationId) {
+            updateMapWithStation(stationId);
+        }
     });
+
+    // Facultatif : charger automatiquement la première station sélectionnée au chargement
+    if (select.value) {
+        updateMapWithStation(select.value);
+    }
+});
   </script>
 <?php if (!empty($message)): ?>
     <div class="message-success" id="popup-success">

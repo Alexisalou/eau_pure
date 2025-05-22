@@ -10,4 +10,7 @@ $conn = new mysqli($DATABASE_HOST, $DATABASE_USER, $DATABASE_PASSWORD, $DATABASE
 if ($conn->connect_error) {
     die("Connexion échouée : " . $conn->connect_error);
 }
+
+//ligne pour forcer l'encodage UTF-8
+$conn->set_charset("utf8mb4");
 ?>

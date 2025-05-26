@@ -1,6 +1,12 @@
 <?php
 session_start();
 
+if (!isset($_SESSION['technicien_id'])) {
+    // Option : renvoyer une erreur JSON ou rediriger vers la page de connexion
+    header('Location: index.php');
+    exit();
+}
+
 require_once 'connexion_bdd.php';
 
 // Récupérer les rivières (stations) depuis la base de données
@@ -261,8 +267,11 @@ $conn->close();
                     </p>
                 </div>
 
-                <button type="submit" class="btn-submit">Envoyer</button>
+                <button type="submit" class="btn-submit">Envoyer</button>         
             </form>
+				<form method="post" action="deconnexion.php">
+				<button type="submit" class="btn-logout">Déconnexion</button>
+			</form>
         </div>
     </div>
 
@@ -302,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         .addTo(map)
                         .bindPopup(data.nom || 'Station sélectionnée')
                         .openPopup();
-                    map.setView([data.latitude, data.longitude], 12);
+                    map.setView([data.latitude, data.longitude], 6);
                 } else {
                     console.error('Coordonnées non valides ou station introuvable.');
                 }

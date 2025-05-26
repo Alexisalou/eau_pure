@@ -54,8 +54,6 @@ db_config = {
     'database': 'eau_pure',
     'port': '9999'
 }
-stations = recuperer_technicien_mesure(db_config)
-for station in stations:
-    print(f"Station: {station['id']}, Technicien: {station['numero_de_telephone']} ({station['technicien']})")
+
 
 

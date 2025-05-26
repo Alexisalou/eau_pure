@@ -266,7 +266,7 @@ $conn->close();
                         Par méthode chimique, souvent avec du dichromate de potassium et un catalyseur, mesurant la quantité d’oxygène consommée lors de l’oxydation.
                     </p>
                 </div>
-
+ 
                 <button type="submit" class="btn-submit">Envoyer</button>         
             </form>
 				<form method="post" action="deconnexion.php">

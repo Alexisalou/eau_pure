@@ -13,6 +13,8 @@ import {
 import axios from 'axios';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import './donnees_physico_chimiques.css';
+
 
 ChartJS.register(
   CategoryScale,
@@ -59,7 +61,7 @@ const DonneesPhysicoChimiques = () => {
 
   useEffect(() => {
     if (!mapRef.current) {
-      const map = L.map('map').setView([46.6031, 1.8883], 6);
+      const map = L.map('map').setView([48.3, -3.1], 8);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
@@ -189,20 +191,10 @@ const DonneesPhysicoChimiques = () => {
         </>
       )}
 
-      <div>
-        <h2>Données JSON</h2>
-        {rawData ? (
-          <pre>{JSON.stringify(rawData, null, 2)}</pre>
-        ) : (
-          <p>Chargement des données...</p>
-        )}
-      </div>
 
       {/* Afficher le contenu du popup lorsque l'on clique sur un marqueur */}
       {popupContent && (
         <div style={{ marginTop: '20px' }}>
-          <h3>Données récentes pour le marqueur sélectionné</h3>
-          <div>{popupContent}</div>
         </div>
       )}
     </div>
@@ -210,3 +202,5 @@ const DonneesPhysicoChimiques = () => {
 };
 
 export default DonneesPhysicoChimiques;
+
+

@@ -1,0 +1,80 @@
+/* Fond général */
+body {
+  margin: 0;
+  padding: 5px 0 0 0; /* 40px en haut uniquement */
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #add8e6, #87ceeb);
+  min-height: 100vh;
+}
+
+/* Conteneur principal stylisé */
+.App {
+  background: white;
+  padding: 5px 40px 40px 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  width: 1250px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  min-height: 730px; /* Hauteur fixe */
+}
+
+
+
+/* Titre principal */
+.main-title, .App-header h1 {
+  padding-top: -50px;
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 5px;
+  color: #2a2a2a;
+  font-weight: bold;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Style des sous-titres */
+h2 {
+  color: #333;
+  text-align: center;
+  margin-top: 30px;
+}
+
+/* JSON viewer */
+pre {
+  background-color: #f4f4f4;
+  padding: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+select {
+  display: block;
+  margin: 20px auto; /* Centré horizontalement + un peu d'espace vertical */
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.redirect-button {
+  width: 16%;
+  padding: 8px;
+  border: none;
+  border-radius: 5px;
+  background: #0f4c81;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-weight: bold;
+  margin-bottom: 10px; /* espace sous le titre */
+  margin-top:-15px;
+}
+
+.redirect-button:hover {
+  background: #4682b4;
+}
+
+

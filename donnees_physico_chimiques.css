@@ -1,0 +1,164 @@
+#map {
+  height: 500px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+select {
+  padding: 8px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+
+
+h2 {
+  margin-top: 20px;
+  font-size: 1.5em;
+}
+
+pre {
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(30, 63, 102, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(30, 63, 102, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(30, 63, 102, 0);
+  }
+}
+
+.custom-marker {
+  background-color: #4682b4;
+  border: 2px solid white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: block;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.custom-marker.selected {
+  background-color: #1e3f66;
+  animation: pulse 1.5s infinite;
+}
+
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-color: #f0f4f8;
+  color: #333;
+  padding: 12px 40px 12px 16px;
+  border: 2px solid #4682b4;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  width: 300px;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  font-family: 'Times New Roman', Times, serif;
+}
+
+select:focus {
+  outline: none;
+  border-color: #1e3f66;
+  box-shadow: 0 0 6px rgba(30, 63, 102, 0.4);
+}
+
+option {
+  font-weight: normal;
+  padding: 10px;
+}
+
+.custom-marker {
+  background-color: #4682b4;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: block;
+  border: 2px solid white;
+  box-shadow: 0 0 3px rgba(0,0,0,0.5);
+}
+
+.custom-marker.selected {
+  background-color: #1f4e78;
+  transform: scale(1.2);
+}
+
+/* Style pour le popup */
+.leaflet-popup {
+  max-width: 600px !important;
+}
+
+.leaflet-popup-content {
+  font-size: 15px;
+  max-width: 600px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.leaflet-popup-content-wrapper {
+  padding: 12px;
+}
+
+
+.leaflet-popup-content strong {
+  color: #1e3f66;
+  display: block;
+  margin-top: 5px;
+}
+
+/* -------- POPUP STYLING -------- */
+.popup-content h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #333;
+  text-align: center; /* ➤ Centrer le titre */
+}
+
+.popup-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  text-align: center; /* ➤ Centrer globalement */
+}
+
+.popup-table th,
+.popup-table td {
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  text-align: center; /* ➤ Centrer les cellules */
+}
+
+.popup-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  margin-bottom: 30px;
+  width: 100%;
+  overflow: visible;
+}
+

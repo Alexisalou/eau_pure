@@ -1,0 +1,252 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #add8e6, #87ceeb);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;     /* centrer horizontalement */
+    align-items: center;         /* centrer verticalement */
+}
+
+.container {
+    width: 100%;
+    max-width: 700px;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+
+h1 {
+    text-align: center;
+    color: #333333;
+    font-size: 25px; /* ou 1.5em, ou 24px selon la taille souhaitée */
+}
+
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    color: #333333;
+}
+
+input[type="number"],
+input[type="datetime-local"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: inherit; /* hérite de la police définie plus haut */
+}
+
+.info {
+    max-width: 640px;  /* limite la largeur */
+    max-height: 250px; /* hauteur max fixe, tu peux ajuster */
+    overflow-y: auto;  /* active la barre de défilement verticale si le texte dépasse */
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    margin-top: 5px;
+    line-height: 1.2;
+}
+
+
+
+button {
+    padding: 10px;
+    background-color: #4682b4;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+
+button:hover {
+    background-color: #5f9ea0;
+}
+#date{
+    width: 29%; /* ou une autre valeur comme 60% si tu préfères */
+    font-size: 0.9em; /* taille de texte légèrement plus petite */
+}
+#riviere {
+    width: 33%; /* ou une autre valeur comme 60% si tu préfères */
+    font-size: 0.9em; /* taille de texte légèrement plus petite */
+}
+
+.input-with-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-btn {
+    background-color: #add8e6; /* LightBlue comme le fond */
+    color: #003366; /* Texte bleu foncé pour un bon contraste */
+    border: 1px solid #87ceeb; /* bordure légère bleu ciel */
+    border-radius: 4px;
+    padding: 10px 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.info-btn:hover {
+    background-color: #87ceeb; /* SkyBlue au survol */
+}
+
+
+
+.btn-submit {
+    padding: 10px;
+    background-color: #4682b4; /* LightBlue */
+    color: white; /* Bleu foncé pour le texte */
+    border: 1px solid #87ceeb; /* bordure claire */
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold; /* texte en gras */
+    width: 100px;
+    display: block;
+    margin: 10px auto;
+    transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+    background-color: #5f9ea0; /* SkyBlue au survol */
+}
+
+.btn-logout {
+    position: absolute;
+    top: 10px;
+    right: 405px; /* réduit depuis 400px */
+    padding: 3px 5px; /* réduit hauteur et largeur internes */
+    background-color: #e74c3c;
+    color: white;
+    border: 1px solid #f1948a;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em; /* plus petit texte */
+    font-weight: bold;
+    width: auto; /* ou fixe à 80px si tu veux forcer une largeur */
+    display: block;
+    transition: background-color 0.3s ease;
+}
+
+.btn-logout:hover,
+.btn-logout:focus {
+    outline: none;
+    background-color: #8B0000; /* Rouge foncé */
+}
+
+
+
+.message-success {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    color: #000000;
+    padding: 20px;
+    border-radius: 10px;
+    font-family: linear-gradient;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.message-success .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.message-success .close-btn:hover {
+    color: #000;
+}
+
+.message-success .ok-btn {
+    margin-top: 5px;
+    padding: 6px 12px;
+    background-color: #4682b4;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.message-success .ok-btn:hover {
+    background-color: #5f9ea0;
+}
+
+/*map*/
+.form-layout {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.form-layout .form-group {
+  width: 100%;
+}
+
+.map-container {
+  position: relative;
+  top: -67px;
+  left: 370px;
+  width: 280px;
+  height: 100px;
+}
+
+
+.form-container {
+  flex: 2;
+  min-width: 400px;
+}
+
+#map {
+  height: 100px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+
+
+.form-group.emplacement {
+  margin-bottom: -120px; /* ou 0 si tu veux coller le champ suivant */
+}
+
+.form-group {
+  margin-top: -2px; /* réduit l'espacement vertical */
+  margin-bottom: -11px; /* au lieu de 20px si tu veux réduire globalement */
+}
+
+}
+
+
+
+
+

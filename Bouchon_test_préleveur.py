@@ -39,11 +39,11 @@ def check_and_open_prelever(db_config):
 # Information de connexion BDD
 if __name__ == '__main__':
     db_config = {
-        'host': '10.0.14.4',
-        'user': 'root',
-        'password': 'ieufdl',
-        'database': 'eau_pure',
-        'port': '9999'
+        'host': '',
+        'user': '',
+        'password': '',
+        'database': '',
+        'port': ''
     }
     result = check_and_open_prelever(db_config)
     print(result)  # Affichage du résulat (préleveur ouvert ou fermé)

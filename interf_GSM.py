@@ -2,132 +2,116 @@ import mysql.connector
 from datetime import datetime
 from huawei_lte_api.Client import Client
 from huawei_lte_api.Connection import Connection
-
-# Cette fonction lit les seuils depuis la base de données (pluviomètre et limnimètre)
-def lire_seuils(db_config):
-    try:
-        db = mysql.connector.connect(
-            host=db_config['host'],
-            user=db_config['user'],
-            password=db_config['password'],
-            database=db_config['database'],
-            port=int(db_config['port'])
-        )
-        cursor = db.cursor()
-        cursor.execute("SELECT seuil_pluviometre, seuil_limnimetre FROM Preleveur LIMIT 1")
-        result = cursor.fetchone()
-        db.close()
-
-        # Si on ne récupère rien ou que les seuils sont vides, on lève une erreur
-        if not result or result[0] is None or result[1] is None:
-            raise ValueError("Seuils manquants ou nuls")
-        return result[0], result[1]
-
-    except mysql.connector.Error as err:
-        raise RuntimeError(f"Erreur lecture seuils: {err}")
+import time
 
 # Classe pour gérer l'accès au modem Huawei (connexion, envoi de SMS)
 class HuaweiApi:
-    def __init__(self, base_url='http://192.168.8.1'):
-        self.base_url = base_url
-        self.connection = Connection(base_url)
+    def __init__(self, adresse_modem='http://192.168.8.1'):
+        self.adresse_modem = adresse_modem
+        self.connexion = Connection(adresse_modem)
         self.client = None
 
-    # Gestion de contexte pour ouvrir proprement la connexion
     def __enter__(self):
-        self.connection.__enter__()
-        self.client = Client(self.connection)
+        self.connexion.__enter__()
+        self.client = Client(self.connexion)
         return self
 
-    # Fermeture propre de la connexion
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.connection.__exit__(exc_type, exc_val, exc_tb)
+    def __exit__(self, type_exc, valeur_exc, trace_exc):
+        self.connexion.__exit__(type_exc, valeur_exc, trace_exc)
 
-    # Fonction pour envoyer un SMS via le modem
-    def send_sms(self, phone, message):
+    def envoyer_sms(self, numero, texte):
         if not self.client:
             raise RuntimeError("API Huawei non initialisée")
         try:
-            response = self.client.sms.send_sms(phone, message)
-            print(f"SMS envoyé à {phone}: {message} (Réponse API: {response})")
+            reponse = self.client.sms.send_sms(numero, texte)
+            print(f"SMS envoyé à {numero} : {texte} (Réponse API : {reponse})")
         except Exception as e:
-            print(f"Erreur envoi SMS à {phone}: {e}")
+            print(f"Erreur envoi SMS à {numero} : {e}")
 
 # Fonction principale de vérification des capteurs et d'alerte
-def verifier_et_alert(db_config, huawei_api):
+def verifier_et_alerter(config_bdd, modem_huawei):
     try:
-        # Récupération des seuils de référence
-        seuil_pluviometre, seuil_limnimetre = lire_seuils(db_config)
-
-        # Connexion à la BDD pour récupérer les dernières mesures
-        db = mysql.connector.connect(
-            host=db_config['host'],
-            user=db_config['user'],
-            password=db_config['password'],
-            database=db_config['database'],
-            port=int(db_config['port'])
+        base_donnees = mysql.connector.connect(
+            host=config_bdd['host'],
+            user=config_bdd['user'],
+            password=config_bdd['password'],
+            database=config_bdd['database'],
+            port=int(config_bdd['port'])
         )
-        cursor = db.cursor(dictionary=True)
+        curseur = base_donnees.cursor(dictionary=True)
 
-        # Cette requête récupère les dernières mesures des capteurs PLUVIOMETRE et LIMNIMETRE
         requete = """
-            SELECT t.id AS technicien_id, t.numero_de_telephone, s.id AS station_id, c.reference, m.valeur
+            SELECT 
+                t.id AS technicien_id, 
+                t.numero_de_telephone, 
+                s.id AS station_id, 
+                c.reference, 
+                m.valeur,
+                p.seuil_pluviometre,
+                p.seuil_limnimetre
             FROM Station s
+            JOIN Preleveur p ON p.station = s.id
             JOIN Technicien t ON s.technicien = t.id
             JOIN Capteur c ON c.station = s.id
             JOIN (
                 SELECT capteur, MAX(date) AS max_date
                 FROM Mesure
                 GROUP BY capteur
-            ) latest ON latest.capteur = c.id
-            JOIN Mesure m ON m.capteur = c.id AND m.date = latest.max_date
+            ) dernier ON dernier.capteur = c.id
+            JOIN Mesure m ON m.capteur = c.id AND m.date = dernier.max_date
             WHERE c.reference IN ('PLUVIOMETRE', 'LIMNIMETRE')
         """
-        cursor.execute(requete)
-        mesures = cursor.fetchall()
-        cursor.close()
-        db.close()
+        curseur.execute(requete)
+        mesures = curseur.fetchall()
+        curseur.close()
+        base_donnees.close()
 
-        # On prépare un dictionnaire pour regrouper les alertes par technicien
-        alertes_par_technicien = {}
+        alertes = {}
 
-        for m in mesures:
-            ref = m['reference'].upper()
-            valeur = m['valeur']
-            seuil = seuil_pluviometre if ref == 'PLUVIOMETRE' else seuil_limnimetre
+        for mesure in mesures:
+            type_capteur = mesure['reference'].upper()
+            valeur = mesure['valeur']
+            
+            # Ajustement des seuils
+            if type_capteur == 'PLUVIOMETRE':
+                seuil = mesure['seuil_pluviometre'] * 100  # <-- FACTEUR A AJUSTER
+            else:
+                seuil = mesure['seuil_limnimetre']
 
-            # Si la valeur dépasse le seuil, on prépare un message d'alerte
+            if seuil is None:
+                print(f"⚠️ Seuil manquant pour la station {mesure['station_id']}, capteur {type_capteur}")
+                continue
+
             if valeur > seuil:
-                tech_id = m['technicien_id']
-                phone = m['numero_de_telephone']
-                station = m['station_id']
+                id_technicien = mesure['technicien_id']
+                telephone = mesure['numero_de_telephone']
+                id_station = mesure['station_id']
 
-                ligne = (
-                    f"\n--- Station {station} ---\n"
-                    f"Capteur  : {ref}\n"
+                message_alerte = (
+                    f"\n--- Station {id_station} ---\n"
+                    f"Capteur  : {type_capteur}\n"
                     f"Mesure   : {valeur:.2f}\n"
                     f"Seuil    : {seuil:.2f}"
                 )
 
-                # Si c’est la première alerte pour ce technicien, on initialise sa fiche
-                if tech_id not in alertes_par_technicien:
-                    alertes_par_technicien[tech_id] = {
-                        'phone': phone,
+                if id_technicien not in alertes:
+                    alertes[id_technicien] = {
+                        'telephone': telephone,
                         'messages': []
                     }
-                alertes_par_technicien[tech_id]['messages'].append(ligne)
+                alertes[id_technicien]['messages'].append(message_alerte)
 
-        # On envoie les SMS regroupés par technicien
-        for tech_id, info in alertes_par_technicien.items():
-            header = f"ALERTE DE SEUIL - Technicien {tech_id}"
-            body = "\n".join(info['messages'])
-            timestamp = datetime.now().strftime('%d/%m/%Y %H:%M')
-            full_msg = f"{header}\n{body}\nHeure : {timestamp}"
-            huawei_api.send_sms(info['phone'], full_msg)
+        for id_technicien, infos in alertes.items():
+            titre = f"ALERTE DE SEUIL - Technicien {id_technicien}"
+            corps = "\n".join(infos['messages'])
+            horodatage = datetime.now().strftime('%d/%m/%Y %H:%M')
+            message_complet = f"{titre}\n{corps}\nHeure : {horodatage}"
 
-        # Si aucune alerte n’a été détectée, on l’indique en console
-        if not alertes_par_technicien:
+            modem_huawei.envoyer_sms(infos['telephone'], message_complet)
+            time.sleep(2)  # Pause 2 secondes entre chaque SMS
+
+        if not alertes:
             print(f"[{datetime.now()}] ✅ Toutes les stations sont dans les seuils.")
 
     except Exception as e:
-        print(f"❌ Erreur dans la vérification: {e}")
+        print(f"❌ Erreur dans la vérification : {e}")

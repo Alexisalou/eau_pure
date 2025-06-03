@@ -1,5 +1,5 @@
 import sys
-from interf_GSM import verifier_et_alert, HuaweiApi  # On importe notre logique métier GSM
+from interf_GSM import verifier_et_alerter as verifier_seuils, HuaweiApi  # On importe la logique GSM
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QLabel, QProgressBar, QGraphicsDropShadowEffect
 )
@@ -7,58 +7,57 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont, QColor
 
 # Configuration de la base de données
-DATABASE_HOST = '10.0.14.4'
-DATABASE_NAME = 'eau_pure'
-DATABASE_USER = 'root'
-DATABASE_PASSWORD = 'ieufdl'
-DATABASE_PORT = '9999'
+HOTE_BDD = '10.0.14.4'
+NOM_BDD = 'eau_pure'
+UTILISATEUR_BDD = 'root'
+MOT_DE_PASSE_BDD = 'ieufdl'
+PORT_BDD = '9999'
 
-# On centralise la config dans un dictionnaire pour la passer facilement aux fonctions
-db_config = {
-    'host': DATABASE_HOST,
-    'user': DATABASE_USER,
-    'password': DATABASE_PASSWORD,
-    'database': DATABASE_NAME,
-    'port': DATABASE_PORT,
+# Regroupement dans un dictionnaire de configuration
+config_bdd = {
+    'host': HOTE_BDD,
+    'user': UTILISATEUR_BDD,
+    'password': MOT_DE_PASSE_BDD,
+    'database': NOM_BDD,
+    'port': PORT_BDD,
 }
 
-# Classe principale pour afficher l'écran de chargement avec une barre de progression
-class LoadingScreen(QWidget):
-    def __init__(self, verification_callback):
+# Fenêtre de chargement avec barre de progression
+class EcranChargement(QWidget):
+    def __init__(self, fonction_verification):
         super().__init__()
-        self.verification_callback = verification_callback
-        self.init_ui()
+        self.fonction_verification = fonction_verification
+        self.initialiser_interface()
 
-    # On définit ici l'interface utilisateur
-    def init_ui(self):
+    def initialiser_interface(self):
         self.setWindowTitle("Technicien du SBEP - Surveillance")
         self.setFixedSize(600, 300)
-        self.setStyleSheet("background-color: #001F4D;")  # Fond bleu foncé
+        self.setStyleSheet("background-color: #001F4D;")
 
-        layout = QVBoxLayout()
-        layout.setContentsMargins(50, 50, 50, 50)
+        disposition = QVBoxLayout()
+        disposition.setContentsMargins(50, 50, 50, 50)
 
-        # Titre centré avec effet de lumière
-        label = QLabel("TECHNICIEN DU SBEP", self)
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        font = QFont("Segoe UI", 28, QFont.Weight.Bold)
-        label.setFont(font)
-        label.setStyleSheet("color: white;")
+        # Titre
+        titre = QLabel("TECHNICIEN DU SBEP", self)
+        titre.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        police = QFont("Segoe UI", 28, QFont.Weight.Bold)
+        titre.setFont(police)
+        titre.setStyleSheet("color: white;")
 
-        # Effet d'ombre bleu sous le texte
-        shadow = QGraphicsDropShadowEffect()
-        shadow.setBlurRadius(15)
-        shadow.setOffset(4, 4)
-        shadow.setColor(QColor(0, 150, 255))
-        label.setGraphicsEffect(shadow)
+        # Ombre sous le texte
+        ombre = QGraphicsDropShadowEffect()
+        ombre.setBlurRadius(15)
+        ombre.setOffset(4, 4)
+        ombre.setColor(QColor(0, 150, 255))
+        titre.setGraphicsEffect(ombre)
 
-        layout.addWidget(label)
+        disposition.addWidget(titre)
 
-        # Barre de progression personnalisée
-        self.progress = QProgressBar(self)
-        self.progress.setMaximum(6000)  # 6 secondes d’attente (6000 ms)
-        self.progress.setTextVisible(True)
-        self.progress.setStyleSheet("""
+        # Barre de progression
+        self.barre_progression = QProgressBar(self)
+        self.barre_progression.setMaximum(6000)
+        self.barre_progression.setTextVisible(True)
+        self.barre_progression.setStyleSheet("""
             QProgressBar {
                 border: 2px solid #00aaff;
                 border-radius: 15px;
@@ -74,53 +73,50 @@ class LoadingScreen(QWidget):
                 border-radius: 15px;
             }
         """)
-        layout.addWidget(self.progress)
+        disposition.addWidget(self.barre_progression)
 
-        self.setLayout(layout)
+        self.setLayout(disposition)
 
-        # On initialise le timer pour faire avancer la barre
-        self.elapsed = 0
-        self.timer_progress = QTimer()
-        self.timer_progress.timeout.connect(self.update_progress)
-        self.timer_progress.start(50)  # Incrémente toutes les 50ms
+        # Timer pour avancer la barre
+        self.temps_ecoule = 0
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.mettre_a_jour_progression)
+        self.timer.start(50)
 
-    # Cette fonction fait avancer la barre de progression petit à petit
-    def update_progress(self):
-        self.elapsed += 50
-        if self.elapsed >= 6000:
-            self.elapsed = 6000
-            self.progress.setValue(self.elapsed)
-            self.timer_progress.stop()
-            self.verification_callback()  # Quand on atteint 100%, on lance la vérif
+    def mettre_a_jour_progression(self):
+        self.temps_ecoule += 50
+        if self.temps_ecoule >= 6000:
+            self.temps_ecoule = 6000
+            self.barre_progression.setValue(self.temps_ecoule)
+            self.timer.stop()
+            self.fonction_verification()
         else:
-            self.progress.setValue(self.elapsed)
+            self.barre_progression.setValue(self.temps_ecoule)
 
-# Boucle principale de l'application
-def main_loop():
+# Boucle principale
+def demarrer_application():
     app = QApplication(sys.argv)
 
-    # Fonction appelée à chaque fois que la barre atteint 100%
-    def run_verification():
+    # Fonction de vérification à lancer
+    def lancer_verification():
         print("⏳ Vérification des seuils...")
         try:
-            with HuaweiApi() as huawei_api:
-                verifier_et_alert(db_config, huawei_api)
+            with HuaweiApi() as modem:
+                verifier_seuils(config_bdd, modem)
             print("✅ Vérification terminée.\n")
-        except Exception as e:
-            print(f"❌ Erreur dans la vérification: {e}\n")
+        except Exception as erreur:
+            print(f"❌ Erreur pendant la vérification : {erreur}\n")
 
-        # On redémarre la barre pour la prochaine vérif automatique
-        loading_screen.elapsed = 0
-        loading_screen.progress.setValue(0)
-        loading_screen.timer_progress.start(50)
+        # Réinitialisation de l’écran
+        fenetre.temps_ecoule = 0
+        fenetre.barre_progression.setValue(0)
+        fenetre.timer.start(50)
 
-    # Création de l’écran de chargement avec la fonction de vérification
-    loading_screen = LoadingScreen(run_verification)
-    loading_screen.show()
+    fenetre = EcranChargement(lancer_verification)
+    fenetre.show()
 
-    # Lancement de l’interface graphique Qt
     sys.exit(app.exec())
 
-# Point d’entrée du script
+# Point d'entrée
 if __name__ == "__main__":
-    main_loop()
+    demarrer_application()

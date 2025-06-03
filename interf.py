@@ -1,11 +1,11 @@
 import mysql.connector
 import random
 from datetime import datetime
-DATABASE_HOST = '10.0.14.4'  
-DATABASE_NAME = 'eau_pure'  
-DATABASE_USER = 'root'  
-DATABASE_PASSWORD = 'ieufdl'
-DATABASE_PORT = 9999  # port doit être un int
+DATABASE_HOST = ''  
+DATABASE_NAME = ''  
+DATABASE_USER = ''  
+DATABASE_PASSWORD = ''
+DATABASE_PORT =   # port doit être un int
 
 def get_sensor_id(station_id, reference):
     try:

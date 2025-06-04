@@ -10,8 +10,16 @@ DATABASE_PORT = '9999'  # Port mysql ouvert sur le serveur
 
 PLUVIOMETER_SENSOR_ID = 1
 LIMNIMETER_SENSOR_ID = 2
-
 def Envois_mesures(capteur, valeur, unite, date):
+    conn = None
+    cursor = None
+    try:
+        # Conversion avant connexion, pour attraper l'erreur tôt
+        valeur = float(valeur)
+    except ValueError as ve:
+        print(f"Erreur conversion valeur en float: {ve}")
+        return  # Quitter la fonction car la valeur est invalide
+
     try:
         # Connexion à la BDD
         conn = mysql.connector.connect(
@@ -22,29 +30,25 @@ def Envois_mesures(capteur, valeur, unite, date):
             port=DATABASE_PORT,
         )
         cursor = conn.cursor()
-        
-        valeur = float(valeur)  # Lève une ValueError si 'valeur' n'est pas un float
 
         # Insertion des données
         cursor.execute('''
         INSERT INTO Mesure (capteur, valeur, unite, date)
         VALUES (%s, %s, %s, %s)
         ''', (capteur, valeur, unite, date))
-        
-        # Valider la transaction
-        conn.commit()
-        
-        print(f"Mesure insérée: {capteur}, {valeur}, {unite}, {date}")
-        
-    except mysql.connector.Error as err:
-        print(f"Erreur: {err}")
-        
-    finally:
-        # Fermer la connexion
-        if conn.is_connected():
-            cursor.close()
-            conn.close()
 
+        conn.commit()
+        print(f"Mesure insérée: {capteur}, {valeur}, {unite}, {date}")
+
+    except mysql.connector.Error as err:
+        print(f"Erreur MySQL: {err}")
+    except Exception as e:
+        print(f"Erreur: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
 
 
 db_config = {

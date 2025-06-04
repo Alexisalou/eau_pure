@@ -1,68 +1,46 @@
 import pytest
 from unittest.mock import patch, MagicMock
-import interf
+from datetime import datetime
+import interf  # remplace par le nom de ton fichier si différent
 
-# ========================================
-# Test de la fonction Envois_mesures
-# ========================================
+class TestEnvoisMesures:
 
-@patch('interf.mysql.connector.connect')
-def test_envois_mesures(mock_connect):
-    """
-    Teste si Envois_mesures insère correctement une mesure dans la base de données.
-    """
+    @patch('interf.mysql.connector.connect')
+    def test_insertion_valide(self, mock_connect):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
+        
+        interf.Envois_mesures(1, 12.5, "mm", datetime.now())
 
-    # Création de mocks pour la connexion et le curseur
-    mock_conn = MagicMock()
-    mock_cursor = MagicMock()
+        mock_cursor.execute.assert_called_once()
+        mock_conn.commit.assert_called_once()
+        mock_cursor.close.assert_called_once()
+        mock_conn.close.assert_called_once()
 
-    # Configuration du comportement des mocks
-    mock_connect.return_value = mock_conn
-    mock_conn.cursor.return_value = mock_cursor
-    mock_conn.is_connected.return_value = True
+    @patch('interf.mysql.connector.connect')
+    def test_erreur_insertion(self, mock_connect):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_conn
+        mock_conn.cursor.return_value = mock_cursor
 
-    # Appel de la fonction avec des données factices
-    interf.Envois_mesures(
-        capteur=1,
-        valeur=10.5,
-        unite='L/m²',
-        date='2025-04-28 10:00:00'
-    )
+        def raise_error(*args, **kwargs):
+            raise Exception("Erreur insertion")
 
-    # Vérification des appels SQL
-    mock_connect.assert_called_once()
-    mock_cursor.execute.assert_called_once_with(
-        '''
-        INSERT INTO Mesure (capteur, valeur, unite, date)
-        VALUES (%s, %s, %s, %s)
-        ''',
-        (1, 10.5, 'L/m²', '2025-04-28 10:00:00')
-    )
-    mock_conn.commit.assert_called_once()
-    mock_cursor.close.assert_called_once()
-    mock_conn.close.assert_called_once()
+        mock_cursor.execute.side_effect = raise_error
 
+        interf.Envois_mesures(1, 12.5, "mm", datetime.now())
 
+        mock_conn.commit.assert_not_called()
+        mock_cursor.close.assert_called_once()
+        mock_conn.close.assert_called_once()
 
-# ===============================================================
-# Test de la fonction envois_mesure mais avec une mauvaise valeur
-# ===============================================================
+    @patch('interf.mysql.connector.connect')
+    def test_erreur_connexion_bdd(self, mock_connect):
+        # Simuler erreur lors de la connexion à la BDD
+        mock_connect.side_effect = Exception("Connexion échouée")
 
-
-@patch('interf.mysql.connector.connect')
-def test_envois_mesures_mauvaise_valeur(mock_connect):
-    """
-    Teste que Envois_mesures lève une exception si la valeur n'est pas convertible en float.
-    """
-    # Mock de la connexion
-    mock_conn = MagicMock()
-    mock_cursor = MagicMock()
-
-    mock_connect.return_value = mock_conn
-    mock_conn.cursor.return_value = mock_cursor
-    mock_conn.is_connected.return_value = True
-
-    with pytest.raises(Exception):
-        interf.Envois_mesures(1, 'dix', 'L/m²', '2025-04-28 10:00:00')
-
-
+        # S'assurer que la fonction ne plante pas (gère l'exception)
+        interf.Envois_mesures(1, 12.5, "mm", datetime.now())

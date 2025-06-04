@@ -1,142 +1,116 @@
 import pytest
-from unittest.mock import patch, MagicMock
-import interf_GSM
+from unittest.mock import MagicMock, patch
+from interf_GSM import verifier_et_alerter
 
-# ----------- Test lire_seuils -----------
+# Configuration de test
+db_config = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': 'root',
+    'database': 'eau_pure',
+    'port': 3306
+}
+
 @patch('interf_GSM.mysql.connector.connect')
-def test_lire_seuils_valeurs_valides(mock_connect):
-    mock_db = MagicMock()
+def test_verifier_et_alert_alerte_envoyee(mock_connect):
+    # Mock DB
+    mock_conn = MagicMock()
     mock_cursor = MagicMock()
-    mock_connect.return_value = mock_db
-    mock_db.cursor.return_value = mock_cursor
-    mock_cursor.fetchone.return_value = (50.0, 10.0)
+    mock_connect.return_value = mock_conn
+    mock_conn.cursor.return_value = mock_cursor
+    
+    # Pluviomètre dépasse le seuil (60 > 50*100)
+    mock_cursor.fetchall.return_value = [{
+        'technicien_id': 1,
+        'numero_de_telephone': '0612345678',
+        'station_id': 1,
+        'reference': 'PLUVIOMETRE',
+        'valeur': 6000.0,  # dépasse 50*100 = 5000
+        'seuil_pluviometre': 50.0,
+        'seuil_limnimetre': 10.0
+    }]
+    
+    modem_mock = MagicMock()
+    
+    verifier_et_alerter(db_config, modem_mock)
+    
+    # SMS doit être envoyé
+    modem_mock.envoyer_sms.assert_called_once()
+    args, _ = modem_mock.envoyer_sms.call_args
+    assert 'ALERTE DE SEUIL' in args[1]
 
-    db_config = {
-        'host': 'localhost',
-        'user': 'root',
-        'password': 'root',
-        'database': 'eau_pure',
-        'port': 3306
-    }
-
-    seuils = interf_GSM.lire_seuils(db_config)
-    assert seuils == (50.0, 10.0)
-
-
-# ----------- Test HuaweiApi -----------
-@patch('interf_GSM.Client')
-@patch('interf_GSM.Connection')
-def test_huaweiapi_context(mock_conn, mock_client):
-    mock_conn_instance = MagicMock()
-    mock_client_instance = MagicMock()
-    mock_conn.return_value = mock_conn_instance
-    mock_client.return_value = mock_client_instance
-
-    with interf_GSM.HuaweiApi() as api:
-        assert api.client == mock_client_instance
-        mock_conn.assert_called_once()
-        mock_client.assert_called_once_with(mock_conn_instance)
-
-
-
-@patch('interf_GSM.Client')
-@patch('interf_GSM.Connection')
-def test_huaweiapi_send_sms(mock_conn, mock_client):
-    mock_conn_instance = MagicMock()
-    mock_client_instance = MagicMock()
-    mock_client_instance.sms.send_sms = MagicMock(return_value="OK")
-
-    mock_conn.return_value.__enter__.return_value = mock_conn_instance
-    mock_client.return_value = mock_client_instance
-
-    with interf_GSM.HuaweiApi() as api:
-        api.client = mock_client_instance
-        api.send_sms("+33612345678", "Message test")
-
-        mock_client_instance.sms.send_sms.assert_called_once_with("+33612345678", "Message test")
-
-
-# ----------- Test verifier_et_alert -----------
-@patch('interf_GSM.lire_seuils')
 @patch('interf_GSM.mysql.connector.connect')
-def test_verifier_et_alert_alerte_envoyee(mock_connect, mock_lire_seuils):
-    mock_lire_seuils.return_value = (50.0, 10.0)
-
-    mock_db = MagicMock()
+def test_verifier_et_alert_aucune_alerte(mock_connect):
+    mock_conn = MagicMock()
     mock_cursor = MagicMock()
-    mock_connect.return_value = mock_db
-    mock_db.cursor.return_value = mock_cursor
+    mock_connect.return_value = mock_conn
+    mock_conn.cursor.return_value = mock_cursor
 
-    mock_cursor.fetchall.return_value = [
-        {
-            'technicien_id': 1,
-            'numero_de_telephone': '+33612345678',
-            'station_id': 42,
-            'reference': 'PLUVIOMETRE',
-            'valeur': 55.0
-        },
-        {
-            'technicien_id': 1,
-            'numero_de_telephone': '+33612345678',
-            'station_id': 42,
-            'reference': 'LIMNIMETRE',
-            'valeur': 5.0
-        }
-    ]
+    # Valeur en dessous des seuils
+    mock_cursor.fetchall.return_value = [{
+        'technicien_id': 1,
+        'numero_de_telephone': '0612345678',
+        'station_id': 1,
+        'reference': 'LIMNIMETRE',
+        'valeur': 5.0,
+        'seuil_pluviometre': 50.0,
+        'seuil_limnimetre': 10.0
+    }]
 
-    mock_api = MagicMock()
-    db_config = {
-        'host': 'localhost',
-        'user': 'root',
-        'password': 'root',
-        'database': 'eau_pure',
-        'port': 3306
-    }
+    modem_mock = MagicMock()
+    verifier_et_alerter(db_config, modem_mock)
+    modem_mock.envoyer_sms.assert_not_called()
 
-    interf_GSM.verifier_et_alert(db_config, mock_api)
-
-    mock_api.send_sms.assert_called_once()
-    args, kwargs = mock_api.send_sms.call_args
-    assert "+33612345678" in args[0]
-    assert "PLUVIOMETRE" in args[1]
-
-
-@patch('interf_GSM.lire_seuils')
+@patch('interf_GSM.mysql.connector.connect', side_effect=Exception("Erreur DB"))
+def test_verifier_et_alert_erreur_connexion(mock_connect):
+    modem_mock = MagicMock()
+    verifier_et_alerter(db_config, modem_mock)
+    modem_mock.envoyer_sms.assert_not_called()
 @patch('interf_GSM.mysql.connector.connect')
-def test_verifier_et_alert_aucune_alerte(mock_connect, mock_lire_seuils):
-    mock_lire_seuils.return_value = (60.0, 10.0)
-
-    mock_db = MagicMock()
+def test_verifier_et_alert_seuil_manquant(mock_connect):
+    mock_conn = MagicMock()
     mock_cursor = MagicMock()
-    mock_connect.return_value = mock_db
-    mock_db.cursor.return_value = mock_cursor
+    mock_connect.return_value = mock_conn
+    mock_conn.cursor.return_value = mock_cursor
 
-    mock_cursor.fetchall.return_value = [
-        {
-            'technicien_id': 1,
-            'numero_de_telephone': '+33612345678',
-            'station_id': 42,
-            'reference': 'PLUVIOMETRE',
-            'valeur': 50.0
-        },
-        {
-            'technicien_id': 1,
-            'numero_de_telephone': '+33612345678',
-            'station_id': 42,
-            'reference': 'LIMNIMETRE',
-            'valeur': 8.0
-        }
-    ]
+    # seuil_pluviometre manquant (None)
+    mock_cursor.fetchall.return_value = [{
+        'technicien_id': 1,
+        'numero_de_telephone': '0612345678',
+        'station_id': 1,
+        'reference': 'PLUVIOMETRE',
+        'valeur': 6000.0,
+        'seuil_pluviometre': None,
+        'seuil_limnimetre': 10.0
+    }]
 
-    mock_api = MagicMock()
-    db_config = {
-        'host': 'localhost',
-        'user': 'root',
-        'password': 'root',
-        'database': 'eau_pure',
-        'port': 3306
-    }
+    modem_mock = MagicMock()
+    verifier_et_alerter(db_config, modem_mock)
+    modem_mock.envoyer_sms.assert_not_called()
 
-    interf_GSM.verifier_et_alert(db_config, mock_api)
+@patch('interf_GSM.mysql.connector.connect')
+def test_verifier_et_alert_sms_exception(mock_connect):
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+    mock_connect.return_value = mock_conn
+    mock_conn.cursor.return_value = mock_cursor
 
-    mock_api.send_sms.assert_not_called()
+    # Valeur dépasse le seuil => SMS devrait être envoyé
+    mock_cursor.fetchall.return_value = [{
+        'technicien_id': 1,
+        'numero_de_telephone': '0612345678',
+        'station_id': 1,
+        'reference': 'LIMNIMETRE',
+        'valeur': 20.0,
+        'seuil_pluviometre': 50.0,
+        'seuil_limnimetre': 10.0
+    }]
+
+    modem_mock = MagicMock()
+    # Simule une erreur lors de l'envoi de SMS
+    modem_mock.envoyer_sms.side_effect = Exception("Erreur d'envoi")
+
+    try:
+        verifier_et_alerter(db_config, modem_mock)
+    except Exception:
+        pytest.fail("La fonction ne doit pas lever une exception même si le SMS échoue")

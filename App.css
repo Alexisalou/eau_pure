@@ -1,80 +1,81 @@
-/* Fond général */
+/* Fond général du body de la page */
 body {
-  margin: 0;
-  padding: 5px 0 0 0; /* 40px en haut uniquement */
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #add8e6, #87ceeb);
-  min-height: 100vh;
+  margin: 0; /* Supprime les marges par défaut du navigateur */
+  padding: 5px 0 0 0; /* Ajoute un petit espace en haut uniquement */
+  font-family: Arial; /* Police par défaut */
+  background: linear-gradient(135deg, #add8e6, #87ceeb); /* Dégradé bleu clair */
+  min-height: 100vh; /* S'assure que le body fait au moins 100% de la hauteur de la fenêtre */
 }
 
-/* Conteneur principal stylisé */
+/* Style du conteneur principal de l'application React */
 .App {
-  background: white;
-  padding: 5px 40px 40px 40px;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  width: 1250px;
-  box-sizing: border-box;
-  margin: 0 auto;
-  min-height: 730px; /* Hauteur fixe */
+  background: white; /* Fond blanc */
+  padding: 5px 40px 40px 40px; /* Espacement interne (haut, droite, bas, gauche) */
+  border-radius: 16px; /* Coins arrondis */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Ombre portée */
+  width: 1250px; /* Largeur fixe */
+  box-sizing: border-box; /* Inclut padding et border dans la largeur */
+  margin: 0 auto; /* Centre le conteneur horizontalement */
+  min-height: 730px; /* Hauteur minimale pour éviter un affichage trop petit */
 }
 
-
-
-/* Titre principal */
+/* Style du titre principal */
 .main-title, .App-header h1 {
-  padding-top: -50px;
-  text-align: center;
-  font-size: 3rem;
-  margin-bottom: 5px;
-  color: #2a2a2a;
-  font-weight: bold;
-  font-family: 'Segoe UI', sans-serif;
+  padding-top: -50px; /* (Inefficace : padding négatif est ignoré ici) */
+  text-align: center; /* Centre le texte */
+  font-size: 3rem; /* Taille de police très grande */
+  margin-bottom: 5px; /* Petit espace sous le titre */
+  color: #2a2a2a; /* Gris très foncé */
+  font-weight: bold; /* Texte en gras */
+  font-family: 'Liberation Serif', serif; /* Police à empattements */
 }
 
-/* Style des sous-titres */
+/* Style des sous-titres <h2> */
 h2 {
-  color: #333;
-  text-align: center;
-  margin-top: 30px;
+  color: #333; /* Gris foncé */
+  text-align: center; /* Centré */
+  margin-top: 30px; /* Espace au-dessus */
+  font-family: 'Liberation Serif', serif; /* Style cohérent avec le titre */
 }
 
-/* JSON viewer */
+/* Affichage de texte formaté comme JSON (balise <pre>) */
 pre {
-  background-color: #f4f4f4;
-  padding: 15px;
-  border-radius: 8px;
-  overflow-x: auto;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  background-color: #f4f4f4; /* Fond gris clair */
+  padding: 15px; /* Espacement intérieur */
+  border-radius: 8px; /* Coins arrondis */
+  overflow-x: auto; /* Scroll horizontal si nécessaire */
+  font-size: 0.9rem; /* Taille de texte un peu réduite */
+  line-height: 1.4; /* Hauteur de ligne améliorée pour la lisibilité */
 }
 
+/* Style des menus déroulants (<select>) */
 select {
-  display: block;
-  margin: 20px auto; /* Centré horizontalement + un peu d'espace vertical */
-  padding: 8px 12px;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  display: block; /* Prend toute la ligne */
+  margin: 20px auto; /* Centré horizontalement + espace vertical */
+  padding: 8px 12px; /* Espacement intérieur */
+  font-size: 1rem; /* Taille de police normale */
+  border-radius: 8px; /* Coins arrondis */
+  border: 1px solid #ccc; /* Bord gris clair */
 }
 
+/* Style du bouton de redirection */
 .redirect-button {
-  width: 16%;
-  padding: 8px;
-  border: none;
-  border-radius: 5px;
-  background: #0f4c81;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  font-weight: bold;
-  margin-bottom: 10px; /* espace sous le titre */
-  margin-top:-15px;
+  width: 16%; /* Largeur relative */
+  padding: 8px; /* Espacement intérieur */
+  border: none; /* Supprime le contour */
+  border-radius: 5px; /* Coins arrondis */
+  background: #0f4c81; /* Bleu foncé */
+  color: #fff; /* Texte blanc */
+  font-size: 16px; /* Taille de texte standard */
+  cursor: pointer; /* Curseur "main" au survol */
+  transition: background 0.3s ease; /* Transition douce pour le hover */
+  font-weight: bold; /* Texte en gras */
+  margin-bottom: 10px; /* Espace sous le bouton */
+  margin-top: -15px; /* Légère remontée du bouton */
+  font-family: 'Liberation Serif', serif; /* Même police que le reste */
 }
 
+/* Style au survol du bouton de redirection */
 .redirect-button:hover {
-  background: #4682b4;
+  background: #4682b4; /* Bleu plus clair quand on survole */
 }
-
-

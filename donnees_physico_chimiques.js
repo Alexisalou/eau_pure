@@ -24,7 +24,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css'; // Style CSS de Leaflet
 
 // Fichier CSS local pour le composant
-import './donnees_physico_chimiques.css';
+import './donnees_physico_chimiques_react.css';
 
 // Enregistrement des composants nécessaires pour que Chart.js fonctionne
 ChartJS.register(

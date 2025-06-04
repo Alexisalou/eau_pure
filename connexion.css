@@ -1,3 +1,4 @@
+/* Style général du body : fond dégradé, centrage du contenu et suppression des marges/paddings */
 body {
     margin: 0;
     padding: 0;
@@ -9,6 +10,7 @@ body {
     overflow: hidden;
 }
 
+/* Conteneur du formulaire principal : apparence de carte blanche centrée */
 .form-container {
     background: rgba(255, 255, 255, 0.9);
     padding: 40px 60px;
@@ -16,6 +18,7 @@ body {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* Style des labels dans le formulaire */
 .form-container label {
     display: block;
     margin-bottom: 8px;
@@ -23,6 +26,7 @@ body {
     font-weight: bold;
 }
 
+/* Champs texte et mot de passe : mise en forme et légères ombres internes */
 .form-container input[type="text"],
 .form-container input[type="password"] {
     width: 95%;
@@ -33,6 +37,7 @@ body {
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Bouton de soumission du formulaire */
 .form-container input[type="submit"] {
     width: 100%;
     padding: 10px;
@@ -45,10 +50,12 @@ body {
     transition: background 0.3s ease;
 }
 
+/* Changement de couleur au survol */
 .form-container input[type="submit"]:hover {
     background: #87ceeb;
 }
 
+/* Style du bouton générique (ex: retour) */
 .form-container input[type="button"] {
     width: 100%;
     padding: 10px;
@@ -61,10 +68,12 @@ body {
     transition: background 0.3s ease;
 }
 
+/* Survol du bouton */
 .form-container input[type="button"]:hover {
     background: #5f9ea0;
 }
 
+/* Popup d'authentification admin */
 #popupAdmin {
     display: none;
     position: fixed;
@@ -76,6 +85,7 @@ body {
     z-index: 1000;
 }
 
+/* Contenu du formulaire admin : centré et stylé */
 #popupAdmin > form {
     background-color: #fff;
     border-radius: 15px;
@@ -91,6 +101,7 @@ body {
     justify-content: space-between;
 }
 
+/* Label du popup admin centré */
 #popupAdmin label {
     text-align: center;
     margin-bottom: 15px;
@@ -99,6 +110,7 @@ body {
     color: #333;
 }
 
+/* Champ de mot de passe */
 #popupAdmin input[type="password"] {
     width: 100%;
     padding: 6px;
@@ -110,6 +122,7 @@ body {
     text-align: center;
 }
 
+/* Conteneur des boutons (ex: valider, annuler) */
 #popupAdmin .button-container {
     display: flex;
     flex-direction: column;
@@ -118,6 +131,7 @@ body {
     margin-top: auto;
 }
 
+/* Style général des boutons */
 #popupAdmin .button-container button {
     padding: 4px 8px;
     border: none;
@@ -130,24 +144,29 @@ body {
     box-sizing: border-box;
 }
 
+/* Premier bouton : bouton principal (valider) */
 #popupAdmin .button-container button:first-child {
     background-color: #4682b4;
     color: white;
 }
 
+/* Hover pour bouton principal */
 #popupAdmin .button-container button:first-child:hover {
     background-color: #5f9ea0;
 }
 
+/* Dernier bouton : bouton d'annulation */
 #popupAdmin .button-container button:last-child {
     background-color: #f0f0f0;
     color: #333;
 }
 
+/* Hover du bouton d’annulation */
 #popupAdmin .button-container button:last-child:hover {
     background-color: #e0e0e0;
 }
 
+/* Bouton pour fermer le popup */
 #popupAdmin .close {
     position: absolute;
     top: 10px;
@@ -158,7 +177,13 @@ body {
     cursor: pointer;
 }
 
-#popupGestion {
+/* === Popups Gestion / Ajout / Modifier / Supprimer : mêmes structures, différents IDs === */
+
+/* Structure de base d’un popup plein écran */
+#popupGestion,
+#popupAjout,
+#popupModifier,
+#popupSupprimer {
     display: none;
     position: fixed;
     top: 0%;
@@ -172,285 +197,10 @@ body {
     z-index: 1000;
 }
 
-#popupGestion .modal {
-    background-color: #fff;
-    border-radius: 18px;
-    padding: 18px;
-    width: 320px;
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
-    position: relative;
-    text-align: center;
-    transform: scale(1.1);
-}
-
-#popupGestion .modal-header {
-    margin-bottom: 15px;
-    font-size: 1em;
-    font-weight: bold;
-    white-space: nowrap;
-    color: #333;
-}
-
-#popupGestion .modal-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 15px;
-}
-
-#popupGestion .modal-buttons button {
-    padding: 10px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 0.9em;
-    font-weight: bold;
-    width: 100%;
-    box-sizing: border-box;
-    color: white;
-    background-color: #4682b4;
-    transition: background-color 0.3s ease;
-}
-
-#popupGestion .modal-buttons button:hover {
-    background-color: #5f9ea0;
-}
-
-#popupGestion .modal-buttons button.cancel {
-    background-color: #f0f0f0;
-    color: #333;
-}
-
-#popupGestion .modal-buttons button.cancel:hover {
-    background-color: #e0e0e0;
-}
-
-#popupGestion .close-button {
-    position: absolute;
-    top: 7px;
-    right: 7px;
-    background: none;
-    border: none;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-#popupAjout {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-#popupAjout .modal {
-    background-color: #fff;
-    border-radius: 20px;
-    padding: 20px;
-    width: 350px;
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
-    position: relative;
-    text-align: center;
-    transform: scale(1.15);
-}
-
-#popupAjout .modal-header {
-    margin-bottom: 17px;
-    font-size: 1em;
-    font-weight: bold;
-    white-space: nowrap;
-    color: #000;
-}
-
-#popupAjout .modal-body {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    margin-bottom: 17px;
-}
-
-#popupAjout .modal-body label {
-    text-align: left;
-    margin-bottom: 7px;
-    font-size: 0.9em;
-    color: #000;
-}
-
-#popupAjout .modal-body input {
-    padding: 11px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    box-sizing: border-box;
-    font-size: 0.9em;
-}
-
-#popupAjout .modal-buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 13px;
-}
-
-#popupAjout .modal-buttons button {
-    padding: 9px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 0.9em;
-    font-weight: bold;
-}
-
-#popupAjout .modal-buttons button.validate {
-    background-color: #4682b4;
-    color: white;
-}
-
-#popupAjout .modal-buttons button.cancel {
-    background-color: #f0f0f0;
-    color: #000;
-}
-
-#popupAjout .modal-buttons button:hover {
-    background-color: #5f9ea0;
-}
-
-#popupAjout .modal-buttons button.cancel:hover {
-    background-color: #e0e0e0;
-}
-
-#popupAjout .close-button {
-    position: absolute;
-    top: 9px;
-    right: 9px;
-    background: none;
-    border: none;
-    font-size: 15px;
-    cursor: pointer;
-    color: #000;
-}
-
-#popupModifier {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-#popupModifier .modal {
-    background-color: #fff;
-    border-radius: 20px;
-    padding: 20px;
-    width: 350px;
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
-    position: relative;
-    text-align: center;
-    transform: scale(1.15);
-}
-
-#popupModifier .modal-header {
-    margin-bottom: 17px;
-    font-size: 1em;
-    font-weight: bold;
-    white-space: nowrap;
-    color: #000;
-}
-
-#popupModifier .modal-body {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    margin-bottom: 17px;
-}
-
-#popupModifier .modal-body label {
-    text-align: left;
-    margin-bottom: 7px;
-    font-size: 0.9em;
-    color: #000;
-}
-
-#popupModifier .modal-body input {
-    padding: 11px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    box-sizing: border-box;
-    font-size: 0.9em;
-}
-
-#popupModifier .modal-buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 13px;
-}
-
-#popupModifier .modal-buttons button {
-    padding: 9px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 0.9em;
-    font-weight: bold;
-}
-
-#popupModifier .modal-buttons button.validate {
-    background-color: #4682b4;
-    color: white;
-}
-
-#popupModifier .modal-buttons button.cancel {
-    background-color: #f0f0f0;
-    color: #000;
-}
-
-#popupModifier .modal-buttons button:hover {
-    background-color: #5f9ea0;
-}
-
-#popupModifier .modal-buttons button.cancel:hover {
-    background-color: #e0e0e0;
-}
-
-#popupModifier .close-button {
-    position: absolute;
-    top: 9px;
-    right: 9px;
-    background: none;
-    border: none;
-    font-size: 15px;
-    cursor: pointer;
-    color: #000;
-}
-
-#popupSupprimer {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
+/* Contenu modal centré */
+#popupGestion .modal,
+#popupAjout .modal,
+#popupModifier .modal,
 #popupSupprimer .modal {
     background-color: #fff;
     border-radius: 20px;
@@ -462,7 +212,8 @@ body {
     transform: scale(1.15);
 }
 
-#popupSupprimer .modal-header {
+/* En-tête du popup */
+.modal-header {
     margin-bottom: 17px;
     font-size: 1em;
     font-weight: bold;
@@ -470,21 +221,22 @@ body {
     color: #000;
 }
 
-#popupSupprimer .modal-body {
+/* Corps du formulaire : champs + labels */
+.modal-body {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     margin-bottom: 17px;
 }
 
-#popupSupprimer .modal-body label {
+.modal-body label {
     text-align: left;
     margin-bottom: 7px;
     font-size: 0.9em;
     color: #000;
 }
 
-#popupSupprimer .modal-body input {
+.modal-body input {
     padding: 11px;
     border: 1px solid #ccc;
     border-radius: 10px;
@@ -493,41 +245,66 @@ body {
     font-size: 0.9em;
 }
 
-#popupSupprimer .modal-buttons {
+/* Boutons dans les popups */
+/* Boutons dans les popups */
+.modal-buttons {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 13px;
 }
 
-#popupSupprimer .modal-buttons button {
+.modal-buttons button {
     padding: 9px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     font-size: 0.9em;
     font-weight: bold;
-}
-
-#popupSupprimer .modal-buttons button.validate {
     background-color: #4682b4;
     color: white;
+    transition: background-color 0.3s ease;
 }
 
-#popupSupprimer .modal-buttons button.cancel {
+/* Bouton d’annulation (tous popups) */
+.modal-buttons button.cancel {
     background-color: #f0f0f0;
     color: #000;
 }
 
-#popupSupprimer .modal-buttons button:hover {
+/* Hover sur tous les boutons */
+.modal-buttons button:hover {
     background-color: #5f9ea0;
 }
 
-#popupSupprimer .modal-buttons button.cancel:hover {
+.modal-buttons button.cancel:hover {
     background-color: #e0e0e0;
 }
 
-#popupSupprimer .close-button {
+
+/* Bouton de validation */
+.modal-buttons button.validate {
+    background-color: #4682b4;
+    color: white;
+}
+
+/* Bouton d’annulation */
+.modal-buttons button.cancel {
+    background-color: #f0f0f0;
+    color: #000;
+}
+
+/* Hover sur les boutons */
+.modal-buttons button:hover {
+    background-color: #5f9ea0;
+}
+
+.modal-buttons button.cancel:hover {
+    background-color: #e0e0e0;
+}
+
+/* Bouton pour fermer la modal */
+.close-button {
     position: absolute;
     top: 9px;
     right: 9px;
@@ -538,6 +315,7 @@ body {
     color: #000;
 }
 
+/* Classe générique pour un bouton de création ou action similaire */
 .nouvelle-classe {
     width: 100%;
     padding: 10px;
@@ -555,6 +333,7 @@ body {
     background: #87ceeb;
 }
 
+/* Message de succès affiché au centre de l’écran */
 .message-success {
 	display: none;
     position: fixed;
@@ -567,7 +346,7 @@ body {
     color: #000000;
     padding: 20px;
     border-radius: 10px;
-    font-family: linear-gradient;
+    font-family: linear-gradient; 
     text-align: center;
     z-index: 1000;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -576,6 +355,7 @@ body {
     justify-content: center;
 }
 
+/* Bouton de fermeture dans la popup de succès */
 .message-success .close-btn {
     position: absolute;
     top: 10px;
@@ -590,6 +370,7 @@ body {
     color: #000;
 }
 
+/* Bouton OK de la popup de succès */
 .message-success .ok-btn {
     margin-top: 10px;
     padding: 6px 12px;

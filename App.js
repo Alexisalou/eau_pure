@@ -22,7 +22,7 @@ function App() {
   // Fonction appelée lorsqu'on clique sur le bouton
   // Elle redirige vers une page PHP (probablement une interface de gestion utilisateurs)
   const handleRedirect = () => {
-    window.location.href = 'http://10.0.14.8:8080/index.php';
+    window.location.href = 'http://192.168.0.225:8080/index.php';
   };
 
   // Rendu JSX du composant App

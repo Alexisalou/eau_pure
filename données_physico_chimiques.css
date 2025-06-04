@@ -1,163 +1,175 @@
+/* === Style général de la page === */
 body {
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #add8e6, #87ceeb);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;     /* centrer horizontalement */
-    align-items: center;         /* centrer verticalement */
+    margin: 0; /* Supprime les marges extérieures du navigateur */
+    padding: 0; /* Supprime les marges intérieures */
+    background: linear-gradient(135deg, #add8e6, #87ceeb); /* Applique un dégradé bleu clair de 135° */
+    min-height: 100vh; /* Hauteur minimum = 100% de la hauteur de la fenêtre */
+    display: flex; /* Active Flexbox pour centrer le contenu */
+    justify-content: center; /* Centre le contenu horizontalement */
+    align-items: center; /* Centre le contenu verticalement */
 }
 
+/* === Conteneur principal (formulaire) === */
 .container {
-    width: 100%;
-    max-width: 700px;
-    padding: 20px;
-    background-color: #ffffff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    width: 100%; /* Prend toute la largeur disponible */
+    max-width: 700px; /* Ne dépasse pas 700px de large */
+    padding: 20px; /* Espace intérieur autour du contenu */
+    background-color: #ffffff; /* Fond blanc */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre légère autour du conteneur */
+    border-radius: 8px; /* Coins arrondis */
 }
 
-
+/* === Titre principal === */
 h1 {
-    text-align: center;
-    color: #333333;
-    font-size: 25px; /* ou 1.5em, ou 24px selon la taille souhaitée */
+    text-align: center; /* Centre le texte */
+    color: #333333; /* Gris foncé */
+    font-size: 25px; /* Taille du texte du titre */
 }
 
-
+/* === Formulaire global === */
 form {
-    display: flex;
-    flex-direction: column;
+    display: flex; /* Utilise flexbox */
+    flex-direction: column; /* Les éléments enfants sont empilés verticalement */
 }
 
+/* === Groupe de champs === */
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Espacement entre les groupes de champs */
 }
 
+/* === Étiquettes de champs (ex: "Date", "Rivière") === */
 label {
-    font-weight: bold;
-    color: #333333;
+    font-weight: bold; /* Texte en gras */
+    color: #333333; /* Couleur gris foncé */
 }
 
+/* === Champs de saisie === */
 input[type="number"],
 input[type="datetime-local"],
 select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #cccccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-family: inherit; /* hérite de la police définie plus haut */
+    width: 100%; /* Champ prend toute la largeur */
+    padding: 10px; /* Espace intérieur */
+    margin-top: 5px; /* Petit espace au-dessus */
+    border: 1px solid #cccccc; /* Bordure grise claire */
+    border-radius: 4px; /* Coins légèrement arrondis */
+    box-sizing: border-box; /* Inclut padding et bordure dans la largeur */
+    font-family: inherit; /* Utilise la même police que le parent */
 }
 
+/* === Zone d'affichage d'informations (ex: texte JSON ou messages) === */
 .info {
-    max-width: 640px;  /* limite la largeur */
-    max-height: 250px; /* hauteur max fixe, tu peux ajuster */
-    overflow-y: auto;  /* active la barre de défilement verticale si le texte dépasse */
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
-    margin-top: 5px;
-    line-height: 1.2;
+    max-width: 640px; /* Largeur maximale */
+    max-height: 250px; /* Hauteur maximale */
+    overflow-y: auto; /* Ajoute une barre de défilement verticale si nécessaire */
+    padding: 10px; /* Espace intérieur */
+    border: 1px solid #ccc; /* Bordure grise */
+    background-color: #f9f9f9; /* Fond gris très clair */
+    margin-top: 5px; /* Petit espace au-dessus */
+    line-height: 1.2; /* Hauteur de ligne pour lisibilité */
 }
 
-
-
+/* === Boutons standards === */
 button {
-    padding: 10px;
-    background-color: #4682b4;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
+    padding: 10px; /* Espace intérieur */
+    background-color: #4682b4; /* Bleu */
+    color: #ffffff; /* Texte blanc */
+    border: none; /* Supprime les bordures */
+    border-radius: 4px; /* Coins arrondis */
+    cursor: pointer; /* Curseur pointeur au survol */
+    font-size: 1em; /* Taille de texte par défaut */
 }
 
-
+/* === Effet de survol sur tous les boutons === */
 button:hover {
-    background-color: #5f9ea0;
+    background-color: #5f9ea0; /* Bleu plus clair */
 }
-#date{
-    width: 29%; /* ou une autre valeur comme 60% si tu préfères */
-    font-size: 0.9em; /* taille de texte légèrement plus petite */
+
+/* === Champ de date (ID spécifique) === */
+#date {
+    width: 29%; /* Largeur spécifique du champ */
+    font-size: 0.9em; /* Légèrement plus petit */
 }
+
+/* === Champ de rivière (ID spécifique) === */
 #riviere {
-    width: 33%; /* ou une autre valeur comme 60% si tu préfères */
-    font-size: 0.9em; /* taille de texte légèrement plus petite */
+    width: 33%;
+    font-size: 0.9em;
 }
 
+/* === Disposition d’un champ et d’un bouton à côté === */
 .input-with-button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: flex; /* Active flexbox */
+    align-items: center; /* Centre verticalement les éléments */
+    gap: 8px; /* Espace entre le champ et le bouton */
 }
 
+/* === Bouton d'information (par ex. : voir plus d'infos) === */
 .info-btn {
-    background-color: #add8e6; /* LightBlue comme le fond */
-    color: #003366; /* Texte bleu foncé pour un bon contraste */
-    border: 1px solid #87ceeb; /* bordure légère bleu ciel */
+    background-color: #add8e6; /* Bleu clair */
+    color: #003366; /* Bleu foncé */
+    border: 1px solid #87ceeb; /* Bordure bleu ciel */
     border-radius: 4px;
-    padding: 10px 10px;
+    padding: 10px;
     cursor: pointer;
     font-size: 0.9em;
 }
 
+/* === Effet de survol pour info-btn === */
 .info-btn:hover {
-    background-color: #87ceeb; /* SkyBlue au survol */
+    background-color: #87ceeb; /* Bleu ciel au survol */
 }
 
-
-
+/* === Bouton de soumission du formulaire === */
 .btn-submit {
     padding: 10px;
-    background-color: #4682b4; /* LightBlue */
-    color: white; /* Bleu foncé pour le texte */
-    border: 1px solid #87ceeb; /* bordure claire */
+    background-color: #4682b4;
+    color: white;
+    border: 1px solid #87ceeb;
     border-radius: 4px;
     cursor: pointer;
     font-size: 1em;
-    font-weight: bold; /* texte en gras */
-    width: 100px;
+    font-weight: bold;
+    width: 100px; /* Largeur fixe */
     display: block;
-    margin: 10px auto;
-    transition: background-color 0.3s ease;
+    margin: 10px auto; /* Centre horizontalement avec marges */
+    transition: background-color 0.3s ease; /* Animation douce */
 }
 
 .btn-submit:hover {
-    background-color: #5f9ea0; /* SkyBlue au survol */
+    background-color: #5f9ea0;
 }
 
+/* === Bouton de déconnexion (positionné en haut à droite) === */
 .btn-logout {
     position: absolute;
     top: 10px;
-    right: 405px; /* réduit depuis 400px */
-    padding: 3px 5px; /* réduit hauteur et largeur internes */
-    background-color: #e74c3c;
+    right: 405px;
+    padding: 3px 5px;
+    background-color: #e74c3c; /* Rouge vif */
     color: white;
     border: 1px solid #f1948a;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.85em; /* plus petit texte */
+    font-size: 0.85em;
     font-weight: bold;
-    width: auto; /* ou fixe à 80px si tu veux forcer une largeur */
+    width: auto;
     display: block;
     transition: background-color 0.3s ease;
 }
 
+/* Effet au survol ou au focus du bouton de déconnexion */
 .btn-logout:hover,
 .btn-logout:focus {
     outline: none;
     background-color: #8B0000; /* Rouge foncé */
 }
 
-
-
+/* === Message de succès (popup) === */
 .message-success {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: fixed; /* Fixé à la fenêtre */
+    top: 50%; /* Centré verticalement */
+    left: 50%; /* Centré horizontalement */
+    transform: translate(-50%, -50%); /* Décalage exact pour centrage */
     width: 300px;
     background-color: #ffffff;
     border: 1px solid #ccc;
@@ -166,10 +178,11 @@ button:hover {
     border-radius: 10px;
     font-family: linear-gradient;
     text-align: center;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Affiche au-dessus du reste */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Ombre de profondeur */
 }
 
+/* Bouton "X" de fermeture dans la popup */
 .message-success .close-btn {
     position: absolute;
     top: 10px;
@@ -184,6 +197,7 @@ button:hover {
     color: #000;
 }
 
+/* Bouton "OK" dans la popup */
 .message-success .ok-btn {
     margin-top: 5px;
     padding: 6px 12px;
@@ -199,32 +213,35 @@ button:hover {
     background-color: #5f9ea0;
 }
 
-/*map*/
+/* === Mise en page formulaire + carte === */
 .form-layout {
   display: flex;
-  gap: 30px;
-  align-items: flex-start;
-  flex-wrap: wrap;
+  gap: 30px; /* Espace entre formulaire et carte */
+  align-items: flex-start; /* Aligne en haut */
+  flex-wrap: wrap; /* Permet de passer à la ligne si trop petit */
 }
 
+/* Tous les groupes de formulaire dans ce layout prennent toute la largeur */
 .form-layout .form-group {
   width: 100%;
 }
 
+/* Conteneur qui contient la carte */
 .map-container {
   position: relative;
-  top: -67px;
-  left: 370px;
+  top: -67px; /* Positionnement vertical (chevauchement possible) */
+  left: 370px; /* Positionnement horizontal */
   width: 280px;
   height: 100px;
 }
 
-
+/* Colonne contenant le formulaire */
 .form-container {
-  flex: 2;
+  flex: 2; /* Prend plus d'espace */
   min-width: 400px;
 }
 
+/* Carte elle-même */
 #map {
   height: 100px;
   width: 100%;
@@ -233,20 +250,14 @@ button:hover {
   margin-top: 10px;
 }
 
-
-
+/* Marge négative pour rapprocher la carte */
 .form-group.emplacement {
-  margin-bottom: -120px; /* ou 0 si tu veux coller le champ suivant */
+  margin-bottom: -120px;
 }
 
+/* Réduction de l'espace vertical global entre champs */
 .form-group {
-  margin-top: -2px; /* réduit l'espacement vertical */
-  margin-bottom: -11px; /* au lieu de 20px si tu veux réduire globalement */
+  margin-top: -2px;
+  margin-bottom: -11px;
 }
-
-}
-
-
-
-
 

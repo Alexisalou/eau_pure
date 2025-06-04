@@ -11,6 +11,22 @@
         <h1>Formulaire de Données Physico-Chimiques pour le Traitement des Eaux</h1>
         <form action="données_physico_chimiques.php" method="post">
             <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="datetime-local" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="riviere">Rivière:</label>
+                <select id="riviere" name="riviere" required>
+                    <?php if (empty($rivieres)): ?>
+                        <option value="">Aucune rivière</option>
+                    <?php else: ?>
+                        <?php foreach ($rivieres as $riviere): ?>
+                            <option value="<?php echo htmlspecialchars($riviere); ?>"><?php echo htmlspecialchars($riviere); ?></option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="ph">pH (0-14):</label>
                 <input type="number" step="0.01" id="ph" name="ph" min="0" max="14" required>
                 <p class="info">

@@ -1,3 +1,13 @@
+// Ce composant React affiche les données physico-chimiques de la qualité de l'eau à l'aide d'une carte interactive (Leaflet)
+// et de graphiques dynamiques (Chart.js). Il permet de :
+// - Visualiser les stations sur une carte avec des popups contenant les dernières données mesurées ou analysées,
+// - Sélectionner une rivière pour afficher ses données (pH, conductivité, turbidité, oxygène, DCO, hauteur d’eau, pluie),
+// - Générer automatiquement des courbes temporelles pour chaque paramètre physico-chimique associé à la rivière sélectionnée.
+//
+// Les données sont récupérées depuis une API Node.js en backend via Axios.
+// Ce composant est un point central de l’interface utilisateur pour l’analyse environnementale des rivières surveillées.
+
+
 // Importation des hooks React pour la gestion des états, effets, et références
 import React, { useEffect, useState, useRef } from 'react';
 
@@ -52,8 +62,8 @@ const DonneesPhysicoChimiques = () => {
     const fetchAllData = async () => {
       try {
         const [analyseRes, mesureRes] = await Promise.all([
-          axios.get('http://localhost:3001/api/analyse'),
-          axios.get('http://localhost:3001/api/mesures'),
+          axios.get('http://10.0.14.8:3001/api/analyse'),
+          axios.get('http://10.0.14.8:3001/api/mesures'),
         ]);
         // Fusionne les deux types de données dans un même tableau
         setRawData([...analyseRes.data, ...mesureRes.data]);
@@ -65,7 +75,7 @@ const DonneesPhysicoChimiques = () => {
     // Fonction pour récupérer la liste des stations
     const fetchStations = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/stations');
+        const response = await axios.get('http://10.0.14.8:3001/api/stations');
         setStations(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des stations :', error);

@@ -1,4 +1,15 @@
 <?php
+/**
+ * Ce fichier affiche une interface de connexion sécurisée avec gestion d’utilisateurs.
+ * Il démarre une session PHP pour générer un token CSRF et se protéger contre les attaques de type Cross-Site Request Forgery.
+ * Le formulaire de connexion utilise une vérification simple avec un numéro de téléphone et un mot de passe.
+ * Des popups permettent aux administrateurs d’ajouter, modifier ou supprimer des utilisateurs.
+ * Toutes les soumissions de formulaire se font en AJAX pour éviter le rechargement de la page.
+ * Des messages de confirmation ou d’erreur s’affichent dynamiquement via une popup dédiée.
+ * L’accès à la gestion des utilisateurs est protégé par un mot de passe administrateur.
+ */
+
+
 // Démarre la session pour permettre l'utilisation de variables de session
 session_start();
 

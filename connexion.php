@@ -1,4 +1,15 @@
 <?php
+/**
+ * Ce fichier gère toutes les requêtes AJAX côté serveur liées à l’authentification et à la gestion des utilisateurs.
+ * Il applique des en-têtes de sécurité HTTP pour protéger contre XSS, clickjacking et injection MIME.
+ * Il configure les cookies de session de manière sécurisée, puis démarre une session PHP.
+ * Il génère un token CSRF pour chaque session afin de sécuriser les requêtes POST.
+ * Il prend en charge plusieurs actions POST : connexion utilisateur, vérification admin, ajout, modification et suppression d’utilisateur.
+ * Chaque action déclenche des contrôles de validité, de sécurité et de cohérence avant de manipuler la base de données.
+ * Il protège la connexion par limitation d’essais par IP et par hachage des mots de passe avec bcrypt.
+ */
+
+
 
 // Configuration des entêtes de sécurité HTTP pour protéger contre plusieurs attaques côté navigateur
 header("Content-Type: application/json"); // Spécifie que la réponse sera au format JSON

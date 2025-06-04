@@ -1,4 +1,16 @@
 <?php
+// Ce fichier permet au technicien connecté de saisir des données physico-chimiques liées à une station de mesure (rivière).
+// Le script effectue les actions suivantes :
+// 1. Vérifie que l'utilisateur est connecté (via la session technicien).
+// 2. Récupère la liste des stations disponibles pour alimenter la liste déroulante.
+// 3. Si le formulaire est soumis :
+//    - Récupère les valeurs saisies (pH, turbidité, conductivité, oxygène dissous, DCO).
+//    - Identifie le préleveur associé à la station sélectionnée.
+//    - Insère un échantillon (avec la date et le préleveur) dans la base de données.
+//    - Insère chaque analyse associée à cet échantillon.
+// 4. Ferme proprement la connexion à la base.
+// Un message de confirmation s'affiche à l'utilisateur si tout s'est bien déroulé.
+
 session_start();
 
 // Vérifie que le technicien est connecté, sinon redirige vers la page de connexion

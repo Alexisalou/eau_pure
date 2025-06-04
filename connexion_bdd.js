@@ -1,3 +1,11 @@
+// Ce serveur Express sert d'API backend pour une application de suivi de la qualité de l'eau.
+// Il se connecte à une base de données MySQL et expose plusieurs points d'accès :
+// - /api/analyse : récupère les données issues des analyses manuelles d'échantillons.
+// - /api/mesures : récupère les mesures automatiques issues des capteurs (pluviomètres, limnimètres).
+// - /api/stations : récupère les coordonnées géographiques et noms des rivières associées aux stations.
+// L'API utilise CORS pour accepter les requêtes du frontend (ex. React) et écoute sur le port 3001.
+
+
 // Import des modules nécessaires
 const express = require('express');       // Framework web minimal
 const mysql = require('mysql');           // Client MySQL pour Node.js

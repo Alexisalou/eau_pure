@@ -1,4 +1,14 @@
 <?php
+// Ce script renvoie les informations détaillées d'une station de mesure au format JSON, à partir de son identifiant passé en paramètre GET.
+// Il est utilisé, par exemple, dans des appels AJAX pour afficher les coordonnées d'une station sélectionnée.
+// Étapes du script :
+// 1. Connexion à la base via un fichier externe (connexion_bdd.php).
+// 2. Vérifie que le paramètre 'id' est présent et valide.
+// 3. Exécute une requête SQL préparée pour éviter les injections.
+// 4. Si une station correspond à l'ID, ses données sont renvoyées en JSON (id, nom, latitude, longitude).
+// 5. Sinon, une erreur JSON est renvoyée indiquant que la station n'existe pas.
+
+
 // Connexion à la base de données (fichier externe qui contient $conn)
 require_once 'connexion_bdd.php';
 

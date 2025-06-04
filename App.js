@@ -1,3 +1,12 @@
+// Composant principal de l'application React "Eau Pure".
+// Il sert de point d'entrée et regroupe les éléments clés de l'interface :
+// - Affiche le titre du projet,
+// - Intègre le composant `DonneesPhysicoChimiques` qui gère la visualisation des données environnementales,
+// - Propose un bouton de redirection vers une interface de gestion des utilisateurs (hébergée en PHP).
+//
+// Ce fichier coordonne les principaux éléments de l'application et assure la navigation vers les outils de gestion.
+
+
 // Importe React (nécessaire pour créer des composants)
 import React from 'react';
 
@@ -13,7 +22,7 @@ function App() {
   // Fonction appelée lorsqu'on clique sur le bouton
   // Elle redirige vers une page PHP (probablement une interface de gestion utilisateurs)
   const handleRedirect = () => {
-    window.location.href = 'http://localhost:8080/index.php';
+    window.location.href = 'http://10.0.14.8:8080/index.php';
   };
 
   // Rendu JSX du composant App

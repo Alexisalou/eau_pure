@@ -7,7 +7,7 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont, QColor
 
 # Configuration de la base de données
-HOTE_BDD = '10.0.14.4'
+HOTE_BDD = '192.168.0.193'
 NOM_BDD = 'eau_pure'
 UTILISATEUR_BDD = 'root'
 MOT_DE_PASSE_BDD = 'ieufdl'

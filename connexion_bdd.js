@@ -19,7 +19,7 @@ app.use(cors());
 
 // Configuration de la base de données MySQL
 const db = mysql.createConnection({
-  host: '10.0.14.4',       // Adresse IP du serveur MySQL
+  host: '192.168.0.193',       // Adresse IP du serveur MySQL
   user: 'root',            // Nom d'utilisateur
   password: 'ieufdl',      // Mot de passe
   database: 'eau_pure',    // Nom de la base de données

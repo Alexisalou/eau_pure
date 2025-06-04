@@ -62,8 +62,8 @@ const DonneesPhysicoChimiques = () => {
     const fetchAllData = async () => {
       try {
         const [analyseRes, mesureRes] = await Promise.all([
-          axios.get('http://10.0.14.8:3001/api/analyse'),
-          axios.get('http://10.0.14.8:3001/api/mesures'),
+          axios.get('http://192.168.0.225:3001/api/analyse'),
+          axios.get('http://192.168.0.225:3001/api/mesures'),
         ]);
         // Fusionne les deux types de données dans un même tableau
         setRawData([...analyseRes.data, ...mesureRes.data]);
@@ -75,7 +75,7 @@ const DonneesPhysicoChimiques = () => {
     // Fonction pour récupérer la liste des stations
     const fetchStations = async () => {
       try {
-        const response = await axios.get('http://10.0.14.8:3001/api/stations');
+        const response = await axios.get('http://192.168.0.225:3001/api/stations');
         setStations(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des stations :', error);

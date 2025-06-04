@@ -9,7 +9,7 @@
 
 
 // Définition des paramètres de connexion à la base de données
-$DATABASE_HOST = '10.0.14.4';         // Adresse IP ou nom d'hôte du serveur MySQL
+$DATABASE_HOST = '192.168.0.193';         // Adresse IP ou nom d'hôte du serveur MySQL
 $DATABASE_NAME = 'eau_pure';          // Nom de la base de données à utiliser
 $DATABASE_USER = 'root';              // Nom d'utilisateur MySQL
 $DATABASE_PASSWORD = 'ieufdl';        // Mot de passe MySQL pour l'utilisateur

@@ -1,20 +1,24 @@
-const express = require('express');
-const mysql = require('mysql');
-const cors = require('cors');
-const app = express();
-const port = 3001;
+// Import des modules nécessaires
+const express = require('express');       // Framework web minimal
+const mysql = require('mysql');           // Client MySQL pour Node.js
+const cors = require('cors');             // Middleware pour autoriser les requêtes depuis d'autres origines
 
+const app = express();                    // Initialisation de l'application Express
+const port = 3001;                        // Port d'écoute du serveur
+
+// Active CORS pour permettre les requêtes depuis le frontend (React)
 app.use(cors());
 
-// Configuration de la connexion à la base de données
+// Configuration de la base de données MySQL
 const db = mysql.createConnection({
-  host: '10.0.14.4',
-  user: 'root',
-  password: 'ieufdl',
-  database: 'eau_pure',
-  port: 9999,
+  host: '10.0.14.4',       // Adresse IP du serveur MySQL
+  user: 'root',            // Nom d'utilisateur
+  password: 'ieufdl',      // Mot de passe
+  database: 'eau_pure',    // Nom de la base de données
+  port: 9999               // Port MySQL personnalisé
 });
 
+// Connexion à la base MySQL
 db.connect((err) => {
   if (err) {
     console.error('Erreur de connexion à la base de données:', err);
@@ -23,7 +27,8 @@ db.connect((err) => {
   console.log('Connecté à la base de données MySQL');
 });
 
-// Endpoint : Données d'analyse manuelle
+
+// 1 : Récupérer les données d'analyse manuelle
 app.get('/api/analyse', (req, res) => {
   const sql = `
     SELECT 
@@ -48,11 +53,12 @@ app.get('/api/analyse', (req, res) => {
       res.status(500).send('Erreur serveur');
       return;
     }
-    res.json(results);
+    res.json(results); // Renvoie un tableau JSON des résultats
   });
 });
 
-// Endpoint : Données de mesures automatiques (pluie, hauteur d'eau)
+
+// 2 : Récupérer les données des capteurs automatiques (pluie, hauteur d'eau)
 app.get('/api/mesures', (req, res) => {
   const sql = `
     SELECT 
@@ -85,7 +91,8 @@ app.get('/api/mesures', (req, res) => {
   });
 });
 
-// Endpoint : Stations (pour affichage statique ou dropdown)
+
+// 3 : Récupérer les informations des stations (lat/lon/rivière)
 app.get('/api/stations', (req, res) => {
   const sql = `
     SELECT latitude, longitude, riviere
@@ -101,7 +108,9 @@ app.get('/api/stations', (req, res) => {
   });
 });
 
-// Serveur
+
+// Lancement du serveur sur le port défini
 app.listen(port, () => {
   console.log(`Serveur en écoute sur le port ${port}`);
 });
+

@@ -1,15 +1,15 @@
 <?php
 session_start();
 
+// Vérifie que le technicien est connecté, sinon redirige vers la page de connexion
 if (!isset($_SESSION['technicien_id'])) {
-    // Option : renvoyer une erreur JSON ou rediriger vers la page de connexion
     header('Location: index.php');
     exit();
 }
 
 require_once 'connexion_bdd.php';
 
-// Récupérer les rivières (stations) depuis la base de données
+// Récupération des stations/rivières dans la base de données
 $rivieres = [];
 $query = "SELECT id, riviere FROM Station";
 $result = $conn->query($query);
@@ -19,10 +19,14 @@ if ($result && $result->num_rows > 0) {
         $rivieres[] = $row;
     }
 } else {
+    // Par défaut, affiche un message si aucune station n’est trouvée
     $rivieres[] = ["id" => "", "riviere" => "Aucune rivière"];
 }
 
+// Si le formulaire est soumis
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+    // Données à insérer dans la table Analyse
     $data = [
         'ph' => ['value' => $_POST['ph'], 'unite' => ''],
         'conductivite' => ['value' => $_POST['conductivite'], 'unite' => 'µS/cm'],
@@ -34,9 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $date = $_POST['date'];
     $station_id = intval($_POST['riviere']);
 
+    // Vérifie que l’ID technicien est dans la session
     if (!isset($_SESSION['technicien_id'])) {
         die("ID du technicien non trouvé dans la session.");
     }
+
     $technicien_id = $_SESSION['technicien_id'];
 
     // Trouver le préleveur associé à la station
@@ -53,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     $stmt->close();
 
-    // Insertion dans Echantillon
+    // Insertion de l’échantillon (prélevé à une date par un préleveur)
     $stmt = $conn->prepare("INSERT INTO Echantillon (date, preleveur) VALUES (?, ?)");
     if ($stmt) {
         $stmt->bind_param('si', $date, $preleveur);
@@ -67,26 +73,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         die("Erreur de préparation de la requête SQL pour Echantillon.");
     }
 
-$message = "";
-$insertion_success = false;
+    // Insertion des analyses liées à cet échantillon
+    $message = "";
+    $insertion_success = false;
 
-// Insertion dans Analyse
-$stmt = $conn->prepare("INSERT INTO Analyse (prelevement, valeur, unite, type) VALUES (?, ?, ?, ?)");
-if ($stmt) {
-    foreach ($data as $type => $info) {
-        $stmt->bind_param('idss', $prelevement, $info['value'], $info['unite'], $type);
-        if (!$stmt->execute()) {
-            die("Erreur d'insertion dans la table Analyse: " . $stmt->error);
+    $stmt = $conn->prepare("INSERT INTO Analyse (prelevement, valeur, unite, type) VALUES (?, ?, ?, ?)");
+    if ($stmt) {
+        foreach ($data as $type => $info) {
+            $stmt->bind_param('idss', $prelevement, $info['value'], $info['unite'], $type);
+            if (!$stmt->execute()) {
+                die("Erreur d'insertion dans la table Analyse: " . $stmt->error);
+            }
         }
+        $stmt->close();
+        $insertion_success = true;
+        $message = "Données insérées avec succès !";
     }
-    $stmt->close();
-    $insertion_success = true;
-    $message = "Données insérées avec succès !";
-}
 }
 
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -96,7 +103,9 @@ $conn->close();
     <title>Formulaire de Données Physico-Chimiques</title>
     <link rel="stylesheet" href="données_physico_chimiques.css?v=<?= filemtime(__DIR__ . '/données_physico_chimiques.css') ?>" />
 
+    <!-- Feuille de style Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
         #map {
             height: 200px;
@@ -109,27 +118,28 @@ $conn->close();
     <div class="container">
         <div class="form-container">
             <u><h1>Formulaire de saisie des données physico-chimiques</h1></u><br>
+            
+            <!-- FORMULAIRE PRINCIPAL -->
             <form action="données_physico_chimiques.php" method="post" class="form-layout">
+                <!-- Date de prélèvement -->
                 <div class="form-group">
                     <label for="date">Date :</label>
                     <input type="datetime-local" id="date" name="date" required />
                 </div>
 
+                <!-- Choix de la rivière -->
                 <div class="form-group emplacement">
                     <label for="riviere">Emplacement :</label>
                     <select id="riviere" name="riviere" required>
-                        <?php if (empty($rivieres)): ?>
-                            <option value="">Aucune rivière</option>
-                        <?php else: ?>
-                            <?php foreach ($rivieres as $riviere): ?>
-                                <option value="<?php echo htmlspecialchars($riviere['id']); ?>">
-                                    <?php echo htmlspecialchars($riviere['riviere']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
+                        <?php foreach ($rivieres as $riviere): ?>
+                            <option value="<?= htmlspecialchars($riviere['id']) ?>">
+                                <?= htmlspecialchars($riviere['riviere']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 
+                <!-- Carte pour affichage de la station sélectionnée -->
                 <div class="map-container">
                     <div id="map"></div>
                     <input type="hidden" name="latitude" id="latitude" />
@@ -137,9 +147,9 @@ $conn->close();
                 </div>
 
                 <div class="form-group">
-                    <label for="ph">pH (0 - 14) :</label>
+                    <label for="ph">pH :</label>
                     <div class="input-with-button">
-                        <input type="number" step="1" id="ph" name="ph" min="0" max="14" required />
+                        <input type="number" step="0.1" id="ph" name="ph" min="0" max="14" required />
                         <button type="button" class="info-btn" onclick="toggleInfo('info-ph')">ℹ️</button>
                     </div>
                     <p class="info" id="info-ph" style="display: none; white-space: pre-line;">
@@ -167,7 +177,7 @@ $conn->close();
                 <div class="form-group">
                     <label for="conductivite">Conductivité électrique (µS/cm) :</label>
                     <div class="input-with-button">
-                        <input type="number" step="0.01" id="conductivite" name="conductivite" min="0.05" required />
+                        <input type="number" step="0.1" id="conductivite" name="conductivite" min="0" required />
                         <button type="button" class="info-btn" onclick="toggleInfo('info-conductivite')">ℹ️</button>
                     </div>
                     <p class="info" id="info-conductivite" style="display: none; white-space: pre-line;">
@@ -194,7 +204,7 @@ $conn->close();
                 <div class="form-group">
                     <label for="turbidite">Turbidité (NTU) :</label>
                     <div class="input-with-button">
-                        <input type="number" step="1" id="turbidite" name="turbidite" min="0" required />
+                        <input type="number" step="0.1" id="turbidite" name="turbidite" min="0" required />
                         <button type="button" class="info-btn" onclick="toggleInfo('info-turbidite')">ℹ️</button>
                     </div>
                     <p class="info" id="info-turbidite" style="display: none; white-space: pre-line;">
@@ -221,7 +231,7 @@ $conn->close();
                 <div class="form-group">
                     <label for="oxygene-dissous">Oxygène Dissous (mg/L) :</label>
                     <div class="input-with-button">
-                        <input type="number" step="1" id="oxygene-dissous" name="oxygene-dissous" min="0" required />
+                        <input type="number" step="0.1" id="oxygene-dissous" name="oxygene-dissous" min="0" required />
                         <button type="button" class="info-btn" onclick="toggleInfo('info-oxygene-dissous')">ℹ️</button>
                     </div>
                     <p class="info" id="info-oxygene-dissous" style="display: none; white-space: pre-line;">
@@ -245,7 +255,7 @@ $conn->close();
                 <div class="form-group">
                     <label for="dco">Demande Chimique en Oxygène (DCO) (mg/L) :</label>
                     <div class="input-with-button">
-                        <input type="number" step="1" id="dco" name="dco" min="0" required />
+                        <input type="number" step="0.1" id="dco" name="dco" min="0" required />
                         <button type="button" class="info-btn" onclick="toggleInfo('info-dco')">ℹ️</button>
                     </div>
                     <p class="info" id="info-dco" style="display: none; white-space: pre-line;">
@@ -269,90 +279,94 @@ $conn->close();
  
                 <button type="submit" class="btn-submit">Envoyer</button>         
             </form>
-				<form method="post" action="deconnexion.php">
-				<button type="submit" class="btn-logout">Déconnexion</button>
-			</form>
+
+            <!-- Formulaire de déconnexion -->
+            <form method="post" action="deconnexion.php">
+                <button type="submit" class="btn-logout">Déconnexion</button>
+            </form>
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        function toggleInfo(id) {
-            const info = document.getElementById(id);
-            if (info.style.display === "none" || info.style.display === "") {
-                info.style.display = "block";
-            } else {
-                info.style.display = "none";
-            }
-        }
-    </script>
-    
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const map = L.map('map').setView([48.3, -3.1], 6);
-    const select = document.getElementById('riviere');
-    let marker = null;
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-
-    function updateMapWithStation(id) {
-        fetch(`données_stations.php?id=${id}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.latitude && data.longitude) {
-                    if (marker) {
-                        map.removeLayer(marker);
-                    }
-                    marker = L.marker([data.latitude, data.longitude])
-                        .addTo(map)
-                        .bindPopup(data.nom || 'Station sélectionnée')
-                        .openPopup();
-                    map.setView([data.latitude, data.longitude], 6);
-                } else {
-                    console.error('Coordonnées non valides ou station introuvable.');
-                }
-            })
-            .catch(error => {
-                console.error('Erreur lors du chargement de la station :', error);
-            });
-    }
-
-    // Mettre à jour la carte au changement de sélection
-    select.addEventListener('change', function () {
-        const stationId = this.value;
-        if (stationId) {
-            updateMapWithStation(stationId);
-        }
-    });
-
-    // Facultatif : charger automatiquement la première station sélectionnée au chargement
-    if (select.value) {
-        updateMapWithStation(select.value);
-    }
-});
-  </script>
-<?php if (!empty($message)): ?>
-    <div class="message-success" id="popup-success">
-        <span class="close-btn" onclick="closePopup()">&times;</span>
-        <p><?= htmlspecialchars($message) ?></p>
-        <button class="ok-btn" onclick="closePopup()">OK</button>
-    </div>
-<?php endif; ?>
+<!-- Inclusion de la bibliothèque Leaflet pour l'affichage de la carte -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-function closePopup() {
-    const popup = document.getElementById('popup-success');
-    if (popup) {
-        popup.style.display = 'none';
+    // Fonction pour afficher ou masquer dynamiquement une section d'information (ex : explication pédagogique)
+    function toggleInfo(id) {
+        const info = document.getElementById(id); // On récupère l'élément par son ID
+        // On inverse son affichage : s'il est caché ou non défini, on l'affiche ; sinon, on le cache
+        info.style.display = (info.style.display === "none" || !info.style.display) ? "block" : "none";
     }
-}
+
+    // On attend que tout le HTML soit prêt avant de démarrer le code
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialisation de la carte dans l'élément ayant l'ID "map", centrée sur la Bretagne avec un zoom de 6
+        const map = L.map('map').setView([48.3, -3.1], 6);
+
+        // Récupération du menu déroulant de sélection de rivière/station
+        const select = document.getElementById('riviere');
+
+        // Variable pour stocker le marqueur affiché sur la carte (pour pouvoir le retirer ensuite)
+        let marker = null;
+
+        // Ajout du fond de carte OpenStreetMap (carte de base)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors' // Mention légale obligatoire
+        }).addTo(map);
+
+        // Fonction appelée quand une station est sélectionnée
+        function updateMapWithStation(id) {
+            // Requête pour récupérer les coordonnées de la station en fonction de son ID
+            fetch(`données_stations.php?id=${id}`)
+                .then(response => response.json()) // On convertit la réponse en JSON
+                .then(data => {
+                    // On vérifie que les coordonnées sont bien présentes dans la réponse
+                    if (data.latitude && data.longitude) {
+                        // S'il existe déjà un marqueur, on le supprime
+                        if (marker) map.removeLayer(marker);
+
+                        // On crée un nouveau marqueur à l'emplacement de la station
+                        marker = L.marker([data.latitude, data.longitude])
+                            .addTo(map) // On l'ajoute sur la carte
+                            .bindPopup(data.nom || 'Station sélectionnée') // On associe une infobulle avec le nom de la station
+                            .openPopup(); // On affiche automatiquement l'infobulle
+
+                        // On centre la carte sur la nouvelle position
+                        map.setView([data.latitude, data.longitude], 6);
+                    }
+                })
+                .catch(error => console.error('Erreur :', error)); // Gestion des erreurs réseau ou serveur
+        }
+
+        // Événement déclenché lorsqu'on change de station dans la liste déroulante
+        select.addEventListener('change', () => {
+            const stationId = select.value;
+            if (stationId) updateMapWithStation(stationId); // Mise à jour de la carte
+        });
+
+        // Si une station est déjà sélectionnée au chargement de la page, on l'affiche directement
+        if (select.value) updateMapWithStation(select.value);
+    });
 </script>
 
+
+    <!-- Message de succès après insertion -->
+    <?php if (!empty($message)): ?>
+        <div class="message-success" id="popup-success">
+            <span class="close-btn" onclick="closePopup()">&times;</span>
+            <p><?= htmlspecialchars($message) ?></p>
+            <button class="ok-btn" onclick="closePopup()">OK</button>
+        </div>
+    <?php endif; ?>
+
+    <script>
+        function closePopup() {
+            const popup = document.getElementById('popup-success');
+            if (popup) popup.style.display = 'none';
+        }
+    </script>
 </body>
 </html>
+
 
 

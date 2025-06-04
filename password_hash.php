@@ -7,9 +7,9 @@ function hashPassword($password) {
 }
 
 // Exemple d'utilisation
-$motDePasse = "toto";
-$motDePasseHache = hashPassword($motDePasse);
+$motDePasse = "admin";  // Mot de passe à hacher
+$motDePasseHache = hashPassword($motDePasse);  // Hacher le mot de passe
 
 // Affiche le mot de passe haché
-echo "Mot de passe haché : " . $motDePasseHache;
+echo "Mot de passe haché : " . $motDePasseHache;  // Afficher le mot de passe haché
 ?>
